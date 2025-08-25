@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Pulse.App"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.HearthBeat.App", "Progress.Samples.HearthBeat.App\Progress.Samples.HearthBeat.App.csproj", "{8DEBB035-B737-4C7D-9706-400914D06FC3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.UnitTest", "Progress.UnitTest\Progress.UnitTest.csproj", "{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{8DEBB035-B737-4C7D-9706-400914D06FC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DEBB035-B737-4C7D-9706-400914D06FC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DEBB035-B737-4C7D-9706-400914D06FC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

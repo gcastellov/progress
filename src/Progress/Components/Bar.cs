@@ -2,39 +2,37 @@
 
 namespace Progress.Components;
 
-internal class Bar : IComponent
+internal class Bar : Component
 {
-    private readonly decimal _items;
-    private readonly decimal _count;
     private readonly char _progressSymbol;
     private readonly uint _width;
     private readonly char[] _bar;
 
-    private decimal _percent;
+    private Percent _percent = default!;
+    private ulong _availableItems;
+    private ulong _count;
     private int _adjustedPercent;
 
-    public Bar(ulong availableItems, ulong count, uint width, char progressSymbol)
+    public Bar(uint width, char progressSymbol)
     {
-        _items = availableItems;
-        _count = count;
         _progressSymbol = progressSymbol;
         _width = width;
         _bar = new char[width];
     }
 
-    public bool DisplayPercent { get; set; } = true;
+    public bool DisplayPercent { get; init; } = true;
 
-    private void Fill()
+    public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = _count / _items * 100;
-        _adjustedPercent = (int)(_count / _items * _width);
+        _availableItems = availableItems;
+        _count = currentCount;
+        _percent = Calculate(availableItems, currentCount);
+        return this;
     }
 
     public override string ToString()
     {
         Fill();
-        Array.Fill(_bar, _progressSymbol, 0, _adjustedPercent);
-        Array.Fill(_bar, ' ', _adjustedPercent, (int)(_width - _adjustedPercent));
 
         StringBuilder sBuilder = new();
         sBuilder.Append('[');
@@ -47,15 +45,18 @@ internal class Bar : IComponent
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString("0.00"));
-            sBuilder.Append(" %");
+            sBuilder.Append(_percent.ToString());
         }
 
         return sBuilder.ToString();
     }
 
-    public IComponent Next(ulong availableItems, ulong currentCount)
+    private void Fill()
     {
-        return new Bar(availableItems, currentCount, _width, _progressSymbol);
+        if (_percent.Value > 0)
+            _adjustedPercent = (int)(_count / (decimal)_availableItems * _width);
+
+        Array.Fill(_bar, _progressSymbol, 0, _adjustedPercent);
+        Array.Fill(_bar, ' ', _adjustedPercent, (int)(_width - _adjustedPercent));
     }
 }

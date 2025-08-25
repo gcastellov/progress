@@ -2,14 +2,13 @@
 
 namespace Progress.Components;
 
-internal class Pulse : IComponent
+internal class Pulse : Component
 {
     private readonly char _progressSymbol;
     private readonly char[] _bar;
     
     private uint _index;
-    private decimal _percent;
-    private Pulse _pulse = default!;
+    private Percent _percent = default!;
 
     public Pulse(uint width, char progressSymbol)
     {
@@ -17,27 +16,24 @@ internal class Pulse : IComponent
         _bar = new char[width];
     }
 
-    public bool DisplayPercent { get; set; } = true;
+    public bool DisplayPercent { get; init; } = true;
 
 
-    public IComponent Next(ulong availableItems, ulong currentCount)
+    public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = (decimal)currentCount / (decimal)availableItems * 100;
+        _percent = Calculate(availableItems, currentCount);
 
         _index++;
 
         if (_index == _bar.Length)
             _index = 0;
 
-        return _pulse ??= this;
+        return this;
     }
 
     public override string ToString()
     {
-        Array.Fill(_bar, ' ');
-
-        if (_percent < 100)
-            _bar[_index] = _progressSymbol;
+        Fill();
 
         StringBuilder sBuilder = new();
         sBuilder.Append('[');
@@ -50,10 +46,17 @@ internal class Pulse : IComponent
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString("0.00"));
-            sBuilder.Append(" %");
+            sBuilder.Append(_percent.ToString());
         }
 
         return sBuilder.ToString();
+    }
+
+    private void Fill()
+    {
+        Array.Fill(_bar, ' ');
+
+        if (_percent.Value < 100)
+            _bar[_index] = _progressSymbol;
     }
 }

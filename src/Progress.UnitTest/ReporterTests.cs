@@ -1,0 +1,97 @@
+﻿using Progress.Descriptors;
+using System.Text;
+
+namespace Progress.UnitTest;
+
+public class ReporterTests
+{
+    public ReporterTests()
+    {
+        StringBuilder builder = new StringBuilder();
+        TextWriter writer = new StringWriter(builder);
+        Console.SetOut(writer);
+    }
+
+    [Fact]
+    public void GivenNothingToComplete_WhenInitializing_ThenThrowsException()
+    {
+        // Act
+        var action = () => new Reporter(0, BarDescriptor.Default.Build());
+
+        // Assert
+        action.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
+    public void GivenNoComponent_WhenInitializing_ThenThrowsException()
+    {
+        // Act
+        var action = () => new Reporter(100, null!);
+
+        // Assert
+        action.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void GivenOperationNotStarted_WhenStopping_ThenThrowsException()
+    {
+        // Arrange
+        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+
+        // Act
+        var action = () => reporter.Stop();
+
+        // Assert
+        action.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void GivenOperationNotStarted_WhenResuming_ThenThrowsException()
+    {
+        // Arrange
+        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+
+        // Act
+        var action = () => reporter.Resume();
+
+        // Assert
+        action.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void GivenOperationNotStopped_WhenResuming_ThenThrowsException()
+    {
+        // Arrange
+        using var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        reporter.Start();
+
+        // Act
+        var action = () => reporter.Resume();
+
+        // Assert
+        action.Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void GivenStartedOperation_WhenStopping_ThenSuccess()
+    {
+        // Arrange
+        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        reporter.Start();
+
+        // Act
+        reporter.Stop();
+    }
+
+    [Fact]
+    public void GivenStoppedOperation_WhenResuming_ThenSuccess()
+    {
+        // Arrange
+        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        reporter.Start();
+        reporter.Stop();
+
+        // Act
+        reporter.Resume();
+    }
+}

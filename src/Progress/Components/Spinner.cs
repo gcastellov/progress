@@ -2,23 +2,38 @@
 
 namespace Progress.Components;
 
-internal class Spinner : IComponent
+internal class Spinner : Component
 {
     private int _counter;
     private char _current;
-    private decimal _percent;
 
-    private Spinner _spinner = default!;
+    private Percent _percent = default!;
 
-    public bool DisplayPercent { get; set; } = true;
+    public bool DisplayPercent { get; init; } = true;
 
-    public IComponent Next(ulong availableItems, ulong currentCount)
+    public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = (decimal)currentCount / (decimal)availableItems * 100;
-        return _spinner ??= this;
+        _percent = Calculate(availableItems, currentCount);
+        return this;
     }
 
     public override string ToString()
+    {
+        Fill();
+
+        var sBuilder = new StringBuilder();
+        sBuilder.Append(_current);
+
+        if (DisplayPercent)
+        {
+            sBuilder.Append(' ');
+            sBuilder.Append(_percent.ToString());
+        }
+
+        return sBuilder.ToString();
+    }
+
+    private void Fill()
     {
         _current = _counter switch
         {
@@ -35,17 +50,5 @@ internal class Spinner : IComponent
             _counter = 0;
         else
             _counter++;
-
-        var sBuilder = new StringBuilder();
-        sBuilder.Append(_current);
-
-        if (DisplayPercent)
-        {
-            sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString("0.00"));
-            sBuilder.Append(" %");
-        }
-
-        return sBuilder.ToString();
     }
 }

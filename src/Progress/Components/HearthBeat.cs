@@ -2,15 +2,14 @@
 
 namespace Progress.Components;
 
-internal class HearthBeat : IComponent
+internal class HearthBeat : Component
 {
     private readonly char _progressSymbol;
     private readonly char[] _bar;
 
     private uint _leftIndex;
     private uint _rightIndex;
-    private decimal _percent;
-    private HearthBeat _hearthBeat = default!;
+    private Percent _percent = default!;
 
     public HearthBeat(uint width, char progressSymbol)
     {
@@ -18,11 +17,11 @@ internal class HearthBeat : IComponent
         _bar = new char[width];
     }
 
-    public bool DisplayPercent { get; set; } = true;
+    public bool DisplayPercent { get; init; } = true;
 
-    public IComponent Next(ulong availableItems, ulong currentCount)
+    public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = (decimal)currentCount / (decimal)availableItems * 100;
+        _percent = Calculate(availableItems, currentCount);
 
         if (_leftIndex == 0)
         {
@@ -36,18 +35,12 @@ internal class HearthBeat : IComponent
             _rightIndex++;
         }
 
-        return _hearthBeat ??= this;
+        return this;
     }
 
     public override string ToString()
     {
-        Array.Fill(_bar, ' ');
-
-        if (_percent < 100)
-        {
-            _bar[_leftIndex] = _progressSymbol;
-            _bar[_rightIndex] = _progressSymbol;
-        }
+        Fill();
 
         StringBuilder sBuilder = new();
         sBuilder.Append('[');
@@ -60,8 +53,7 @@ internal class HearthBeat : IComponent
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString("0.00"));
-            sBuilder.Append(" %");
+            sBuilder.Append(_percent.ToString());
         }
 
         return sBuilder.ToString();
@@ -76,5 +68,16 @@ internal class HearthBeat : IComponent
             _leftIndex = --rightIndex;
 
         return (leftIndex, rightIndex);
+    }
+
+    private void Fill()
+    {
+        Array.Fill(_bar, ' ');
+
+        if (_percent.Value < 100)
+        {
+            _bar[_leftIndex] = _progressSymbol;
+            _bar[_rightIndex] = _progressSymbol;
+        }
     }
 }

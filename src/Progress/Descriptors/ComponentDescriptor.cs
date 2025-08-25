@@ -1,15 +1,19 @@
 ﻿using Progress.Components;
+
 namespace Progress.Descriptors;
 
+/// <summary>
+/// The component descriptor base class.
+/// </summary>
 public abstract class ComponentDescriptor
 {
-    protected bool DisplayPercent { get; private set; }
+    internal bool DisplayPercent { get; private set; }
 
-    public ComponentDescriptor DisplayingPercent()
+    internal ComponentDescriptor DisplayingPercent()
     {
         DisplayPercent = true;
         return this;
     }
 
-    internal abstract IComponent Build(ulong availableItems);
+    internal abstract Component Build();
 }
