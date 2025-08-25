@@ -2,6 +2,7 @@
 
 Report progression with ease by using multilple components such as Bars, Spinners, Pulse and more
 
+![Progress](img/logo512x512.png)
 
 ## Report progress for console apps
 

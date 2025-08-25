@@ -1,22 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageId>Progress</PackageId>
+		<Version>1.0.1</Version>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>Gerard Castello</Authors>
+		<Title>Report progress with ease</Title>
+		<Description>Report progression with ease by using multilple components such as Bars, Spinners, Pulse and more</Description>
+		<PackageIcon>Content/logo.png</PackageIcon>
+		<RepositoryUrl>https://github.com/gcastellov/progress</RepositoryUrl>
+		<PackageTags>dotnet, report, progress, background, console</PackageTags>
+	</PropertyGroup>	
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
+
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Progress.UnitTest" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <None Include="Content/logo.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\Content</PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>
