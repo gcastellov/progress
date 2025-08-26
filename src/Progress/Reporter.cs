@@ -13,9 +13,10 @@ public class Reporter : IDisposable
 
     private readonly ulong _itemsCount;
 
-    private Component _component;
+    private bool _isDisposed;
     private ulong _successCount;
     private ulong _failureCount;
+    private Component _component;
     private DateTimeOffset _startedOn = default!;
     private Thread _reportingThread = default!;
     private CancellationTokenSource _cancellationTokenSource = default!;
@@ -64,6 +65,11 @@ public class Reporter : IDisposable
     /// </summary>
     public void Start()
     {
+        if (_isDisposed)
+            throw new ObjectDisposedException("Instance already disposed");
+
+        _successCount = 0;
+        _failureCount = 0;
         _startedOn = DateTimeOffset.UtcNow;
         _cancellationTokenSource = new CancellationTokenSource();
         _cancellationToken = _cancellationTokenSource.Token;
@@ -97,6 +103,8 @@ public class Reporter : IDisposable
         if (_reportingThread.IsAlive)
             throw new InvalidOperationException($"The reporting is still in progress.");
 
+        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationToken = _cancellationTokenSource.Token;
         _reportingThread = DoWork();
         _reportingThread.Start();
     }
@@ -144,15 +152,33 @@ public class Reporter : IDisposable
     }
 
     /// <summary>
-    /// Cancels the reporting task and waits for the reporting thread in case it is alive
+    /// Call <see cref="Dispose()"/> and call for finalize
     /// </summary>
     public void Dispose()
     {
-        if (_cancellationToken.CanBeCanceled)
-            _cancellationTokenSource.Cancel();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        if (_reportingThread != null && _reportingThread.IsAlive)
-            _reportingThread.Join();
+    /// <summary>
+    /// Cancels the reporting task and waits for the reporting thread in case it is alive.
+    /// </summary>
+    /// <param name="disposing"></param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_isDisposed)
+        {
+            _isDisposed = true;
+
+            if (disposing)
+            {
+                if (_cancellationToken.CanBeCanceled)
+                    _cancellationTokenSource.Cancel();
+
+                if (_reportingThread != null && _reportingThread.IsAlive)
+                    _reportingThread.Join();
+            }
+        }
     }
 
     private void Display()

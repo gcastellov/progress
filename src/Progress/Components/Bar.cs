@@ -56,7 +56,10 @@ internal class Bar : Component
         if (_percent.Value > 0)
             _adjustedPercent = (int)(_count / (decimal)_availableItems * _width);
 
-        Array.Fill(_bar, _progressSymbol, 0, _adjustedPercent);
-        Array.Fill(_bar, ' ', _adjustedPercent, (int)(_width - _adjustedPercent));
+        if (_adjustedPercent <= _bar.Length)
+        {
+            Array.Fill(_bar, _progressSymbol, 0, _adjustedPercent);
+            Array.Fill(_bar, ' ', _adjustedPercent, (int)(_width - _adjustedPercent));
+        }
     }
 }

@@ -9,12 +9,13 @@
 
 	<PropertyGroup>
 		<PackageId>Progress</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>Gerard Castello</Authors>
 		<Title>Report progress with ease</Title>
 		<Description>Report progression with ease by using multilple components such as Bars, Spinners, Pulse and more</Description>
 		<PackageIcon>Content/logo.png</PackageIcon>
+		<PackageReadmeFile>Content/README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/gcastellov/progress</RepositoryUrl>
 		<PackageTags>dotnet, report, progress, background, console</PackageTags>
 	</PropertyGroup>	
@@ -38,6 +39,10 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\Content</PackagePath>
 	  </None>
+	  <None Include="Content/README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\Content</PackagePath>
+	  </None>		
 	</ItemGroup>
 
 </Project>
