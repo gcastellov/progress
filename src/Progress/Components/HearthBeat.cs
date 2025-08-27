@@ -9,7 +9,6 @@ internal class HearthBeat : Component
 
     private uint _leftIndex;
     private uint _rightIndex;
-    private Percent _percent = default!;
 
     public HearthBeat(uint width, char progressSymbol)
     {
@@ -21,7 +20,7 @@ internal class HearthBeat : Component
 
     public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = Calculate(availableItems, currentCount);
+        CurrentPercent = Calculate(availableItems, currentCount);
 
         if (_leftIndex == 0)
         {
@@ -53,7 +52,7 @@ internal class HearthBeat : Component
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString());
+            sBuilder.Append(CurrentPercent.ToString());
         }
 
         return sBuilder.ToString();
@@ -74,7 +73,7 @@ internal class HearthBeat : Component
     {
         Array.Fill(_bar, ' ');
 
-        if (_percent.Value < 100)
+        if (CurrentPercent.Value < 100)
         {
             _bar[_leftIndex] = _progressSymbol;
             _bar[_rightIndex] = _progressSymbol;

@@ -5,6 +5,8 @@ using Progress.Samples;
 using var reporter = new ReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
+    .DisplayingTimeOfArrival()
+    .DisplayingRemainingTime()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))

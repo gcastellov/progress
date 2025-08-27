@@ -9,7 +9,7 @@
 
 	<PropertyGroup>
 		<PackageId>Progress</PackageId>
-		<Version>1.1.0</Version>
+		<Version>1.2.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>Gerard Castello</Authors>
 		<Title>Report progress with ease</Title>

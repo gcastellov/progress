@@ -7,13 +7,11 @@ internal class Spinner : Component
     private int _counter;
     private char _current;
 
-    private Percent _percent = default!;
-
     public bool DisplayPercent { get; init; } = true;
 
     public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = Calculate(availableItems, currentCount);
+        CurrentPercent = Calculate(availableItems, currentCount);
         return this;
     }
 
@@ -27,7 +25,7 @@ internal class Spinner : Component
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString());
+            sBuilder.Append(CurrentPercent.ToString());
         }
 
         return sBuilder.ToString();

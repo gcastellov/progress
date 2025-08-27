@@ -8,7 +8,6 @@ internal class Pulse : Component
     private readonly char[] _bar;
     
     private uint _index;
-    private Percent _percent = default!;
 
     public Pulse(uint width, char progressSymbol)
     {
@@ -21,7 +20,7 @@ internal class Pulse : Component
 
     public override Component Next(ulong availableItems, ulong currentCount)
     {
-        _percent = Calculate(availableItems, currentCount);
+        CurrentPercent = Calculate(availableItems, currentCount);
 
         _index++;
 
@@ -46,7 +45,7 @@ internal class Pulse : Component
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString());
+            sBuilder.Append(CurrentPercent.ToString());
         }
 
         return sBuilder.ToString();
@@ -56,7 +55,7 @@ internal class Pulse : Component
     {
         Array.Fill(_bar, ' ');
 
-        if (_percent.Value < 100)
+        if (CurrentPercent.Value < 100)
             _bar[_index] = _progressSymbol;
     }
 }
