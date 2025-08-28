@@ -13,6 +13,9 @@ internal class Timer(DateTimeOffset startedOn)
 
     public TimeSpan GetRemainingTime(double currentPercent)
     {
+        if (currentPercent == 0)
+            return TimeSpan.MaxValue;
+
         var eta = GetEstimatedTimeOfArrival(currentPercent);
         var remaining = eta - DateTimeOffset.Now;
 
@@ -24,6 +27,9 @@ internal class Timer(DateTimeOffset startedOn)
 
     public DateTimeOffset GetEstimatedTimeOfArrival(double currentPercent)
     {
+        if (currentPercent == 0)
+            return DateTimeOffset.MaxValue;
+
         double ms = ElapsedTime.TotalMilliseconds / currentPercent * 100;
         return _startedOn.AddMilliseconds(ms);
     }
