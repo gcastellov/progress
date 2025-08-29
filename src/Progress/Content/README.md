@@ -9,6 +9,8 @@ Report progression with ease by using multilple components such as Bars, Spinner
 using var reporter = new ReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
+    .DisplayingTimeOfArrival()
+    .DisplayingRemainingTime()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
@@ -43,16 +45,28 @@ var descriptor = BarDescriptor.Default;
 var reporter = new ReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
+    .DisplayingTimeOfArrival()
+    .DisplayingRemainingTime()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-    .UsingComponentDescriptor(descriptor)
+    .UsingComponentDescriptor(BarDescriptor.Default)
     .Build(Worker.AllItems);
 ```
 
 ### Start the reporter
 ```csharp
 reporter.Start();
+```
+
+### Stop the reporter
+```csharp
+reporter.Stop();
+```
+
+### Resume the reporter
+```csharp
+reporter.Resume();
 ```
 
 ### Report progress
