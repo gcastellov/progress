@@ -17,7 +17,7 @@ public class Reporter : IDisposable
     private ulong _successCount;
     private ulong _failureCount;
     private Component _component;
-    private DateTimeOffset _startedOn = default!;
+    private Timer _timer;
     private Thread _reportingThread = default!;
     private CancellationTokenSource _cancellationTokenSource = default!;
     private CancellationToken _cancellationToken;
@@ -26,7 +26,9 @@ public class Reporter : IDisposable
     /// Inidicates whehter the task is completed or not.
     /// </summary>
     public bool IsFinished => CurrentCount == _itemsCount;
-    
+
+    internal bool DisplayEstimatedTimeOfArrival { get; set; } = true;
+    internal bool DisplayRemainingTime {  get; set; } = true;
     internal bool DisplayElapsedTime { get; set; } = true;
     internal bool DisplayStartingTime { get; set; } = true;
     internal bool DisplayItemsOverview { get; set; } = true;
@@ -48,6 +50,7 @@ public class Reporter : IDisposable
 
         _itemsCount = itemsCount;
         _component = component;
+        _timer = Timer.Start();
     }
 
     /// <summary>
@@ -70,7 +73,7 @@ public class Reporter : IDisposable
 
         _successCount = 0;
         _failureCount = 0;
-        _startedOn = DateTimeOffset.UtcNow;
+        _timer = Timer.Start();
         _cancellationTokenSource = new CancellationTokenSource();
         _cancellationToken = _cancellationTokenSource.Token;
         _reportingThread = DoWork();
@@ -115,21 +118,38 @@ public class Reporter : IDisposable
     /// <returns></returns>
     public override string ToString()
     {
-        var elapsedTime = DateTimeOffset.UtcNow - _startedOn;
-
         StringBuilder sBuilder = new();
 
         if (DisplayStartingTime)
         {
             string label = "Process started at:".PadRight(RIGHT_PADDING);
-            sBuilder.AppendLine($"{label} {_startedOn.ToString().PadLeft(LEFT_PADDING)}");
+            sBuilder.AppendLine($"{label} {_timer.StartedOn.ToString().PadLeft(LEFT_PADDING)}");
+        }
 
+        if (DisplayEstimatedTimeOfArrival)
+        {
+            string label = "ETA:".PadRight(RIGHT_PADDING);
+            string value = _component.CurrentPercent.Value == 0
+                ? Timer.Unknowm
+                : _timer.GetEstimatedTimeOfArrival(_component.CurrentPercent.Value).ToString();
+                
+            sBuilder.AppendLine($"{label} {value.PadLeft(LEFT_PADDING)}");
         }
 
         if (DisplayElapsedTime)
         {
             string label = "Elapsed time:".PadRight(RIGHT_PADDING);
-            sBuilder.AppendLine($"{label} {elapsedTime.ToString().PadLeft(LEFT_PADDING)}");
+            sBuilder.AppendLine($"{label} {_timer.ElapsedTime.ToString().PadLeft(LEFT_PADDING)}");
+        }
+
+        if (DisplayRemainingTime)
+        {
+            string label = "Remaining time:".PadRight(RIGHT_PADDING);
+            string value = _component.CurrentPercent.Value == 0
+                ? Timer.Unknowm
+                : _timer.GetRemainingTime(_component.CurrentPercent.Value).ToString();
+
+            sBuilder.AppendLine($"{label} {value.PadLeft(LEFT_PADDING)}");
         }
 
         if (DisplayItemsSummary)

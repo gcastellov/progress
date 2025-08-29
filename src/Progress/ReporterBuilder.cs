@@ -8,6 +8,8 @@ namespace Progress;
 /// </summary>
 public class ReporterBuilder
 {
+    private bool _displayRemainingTime;
+    private bool _displayEstTimeOfArrival;
     private bool _displayElapsedTime;
     private bool _displayStartingTime;
     private bool _displayItemsOverview;
@@ -22,6 +24,26 @@ public class ReporterBuilder
     public ReporterBuilder DisplayingElapsedTime()
     {
         _displayElapsedTime = true;
+        return this;
+    }
+
+    /// <summary>
+    /// The reporter will display the remaining time to finish.
+    /// </summary>
+    /// <returns></returns>
+    public ReporterBuilder DisplayingRemainingTime()
+    {
+        _displayRemainingTime = true;
+        return this;
+    }
+
+    /// <summary>
+    /// The reporter will display when the operation is expected to finish.
+    /// </summary>
+    /// <returns></returns>
+    public ReporterBuilder DisplayingTimeOfArrival()
+    {
+        _displayEstTimeOfArrival = true;
         return this;
     }
 
@@ -93,6 +115,8 @@ public class ReporterBuilder
         
         return new Reporter(itemsCount, component)
         {
+            DisplayRemainingTime = _displayRemainingTime,
+            DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival,
             DisplayElapsedTime = _displayElapsedTime,
             DisplayStartingTime = _displayStartingTime,
             DisplayItemsOverview = _displayItemsOverview,

@@ -6,21 +6,23 @@ internal abstract class Component
 {
     private static readonly CultureInfo Culture = new("en-US");
 
+    public Percent CurrentPercent { get; protected set; } = default!;
+
     public abstract Component Next(ulong availableItems, ulong currentCount);
 
     protected static Percent Calculate(ulong availableItems, ulong currentCount) => new(availableItems, currentCount);
 
     internal class Percent
     {
-        private readonly decimal _percent;
+        private readonly double _percent;
         
         public Percent(ulong items, ulong count)
         {
             if (count > 0)
-                _percent = count / (decimal)items;
+                _percent = count / (double)items;
         }
 
-        public decimal Value => _percent * 100;
+        public double Value => _percent * 100;
 
         public override string ToString() => _percent.ToString("P02", Culture);
     }

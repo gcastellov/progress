@@ -8,7 +8,6 @@ internal class Bar : Component
     private readonly uint _width;
     private readonly char[] _bar;
 
-    private Percent _percent = default!;
     private ulong _availableItems;
     private ulong _count;
     private int _adjustedPercent;
@@ -26,7 +25,7 @@ internal class Bar : Component
     {
         _availableItems = availableItems;
         _count = currentCount;
-        _percent = Calculate(availableItems, currentCount);
+        CurrentPercent = Calculate(availableItems, currentCount);
         return this;
     }
 
@@ -45,7 +44,7 @@ internal class Bar : Component
         if (DisplayPercent)
         {
             sBuilder.Append(' ');
-            sBuilder.Append(_percent.ToString());
+            sBuilder.Append(CurrentPercent.ToString());
         }
 
         return sBuilder.ToString();
@@ -53,7 +52,7 @@ internal class Bar : Component
 
     private void Fill()
     {
-        if (_percent.Value > 0)
+        if (CurrentPercent.Value > 0)
             _adjustedPercent = (int)(_count / (decimal)_availableItems * _width);
 
         if (_adjustedPercent <= _bar.Length)
