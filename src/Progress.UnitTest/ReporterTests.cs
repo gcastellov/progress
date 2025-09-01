@@ -7,9 +7,27 @@ public class ReporterTests
 {
     public ReporterTests()
     {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new();
         TextWriter writer = new StringWriter(builder);
         Console.SetOut(writer);
+    }
+
+    [Fact]
+    public void GivenDefaults_WhenInitializing_ThenExpectedSettings()
+    {
+        // Arrange
+        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+
+        // Assert
+        reporter.DisplayStartingTime.Should().BeTrue();
+        reporter.DisplayRemainingTime.Should().BeTrue();
+        reporter.DisplayElapsedTime.Should().BeTrue();
+        reporter.DisplayEstimatedTimeOfArrival.Should().BeTrue();
+        reporter.DisplayItemsOverview.Should().BeTrue();
+        reporter.DisplayItemsSummary.Should().BeTrue();
+        reporter.NotifyStats.Should().BeTrue();
+        reporter.ReportFrequency.Should().Be(TimeSpan.FromSeconds(1));
+        reporter.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
     }
 
     [Fact]
