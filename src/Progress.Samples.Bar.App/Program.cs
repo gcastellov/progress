@@ -2,6 +2,11 @@
 using Progress.Descriptors;
 using Progress.Samples;
 
+var onStatsNotified = (Stats stats) =>
+{
+    // TODO: Implement collect
+};
+
 using var reporter = new ReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
@@ -9,6 +14,7 @@ using var reporter = new ReporterBuilder()
     .DisplayingRemainingTime()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
+    .NotifyingStats(onStatsNotified)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(BarDescriptor.Default)
     .Build(Worker.AllItems);

@@ -14,8 +14,11 @@ public class ReporterBuilder
     private bool _displayStartingTime;
     private bool _displayItemsOverview;
     private bool _displayItemsSummary;
+    private bool _notifyingStats;
     private TimeSpan _reportFrequency = TimeSpan.FromSeconds(1);
+    private TimeSpan _statsFrequency = TimeSpan.FromSeconds(5);
     private ComponentDescriptor _componentDescriptor = BarDescriptor.Default;
+    private Action<Stats> _onStatsNotified = default!;
 
     /// <summary>
     /// The reporter will display the elapsed time since the start.
@@ -101,6 +104,31 @@ public class ReporterBuilder
     }
 
     /// <summary>
+    /// Sets the stats notification callback.
+    /// Default notification frequency is set to 5 seconds.
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public ReporterBuilder NotifyingStats(Action<Stats> callback)
+    {
+        return NotifyingStats(callback, _statsFrequency);
+    }
+
+    /// <summary>
+    /// Sets the stats notification callback with the invocation frequency .
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <param name="statsFrequency"></param>
+    /// <returns></returns>
+    public ReporterBuilder NotifyingStats(Action<Stats> callback, TimeSpan statsFrequency)
+    {
+        _onStatsNotified = callback;
+        _statsFrequency = statsFrequency;
+        _notifyingStats = true;
+        return this;
+    }
+
+    /// <summary>
     /// Builds the reporte getting an instance of <see cref="Reporter"/>.
     /// </summary>
     /// <param name="itemsCount"></param>
@@ -121,7 +149,10 @@ public class ReporterBuilder
             DisplayStartingTime = _displayStartingTime,
             DisplayItemsOverview = _displayItemsOverview,
             DisplayItemsSummary = _displayItemsSummary,
+            NotifyStats = _notifyingStats,
             ReportFrequency = _reportFrequency,
+            StatsFrequency = _statsFrequency,
+            OnStatsNotified = _onStatsNotified,
         };
     }
 }
