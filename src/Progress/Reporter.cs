@@ -30,9 +30,14 @@ public class Reporter : IDisposable
     public bool IsFinished => CurrentCount == _itemsCount;
 
     /// <summary>
-    /// Gets or sets the stats notification hook.
+    /// Gets or sets the progress notification hook which invocation happens during the operation.
     /// </summary>
-    public Action<Stats> OnStatsNotified { get; set; } = default!;
+    public Action<Stats>? OnProgress { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the completion hook which invocation happens at the end of the operation.
+    /// </summary>
+    public Action<Stats>? OnCompletion { get; set; } = null!;
 
     internal bool DisplayEstimatedTimeOfArrival { get; set; } = true;
     internal bool DisplayRemainingTime {  get; set; } = true;
@@ -40,7 +45,8 @@ public class Reporter : IDisposable
     internal bool DisplayStartingTime { get; set; } = true;
     internal bool DisplayItemsOverview { get; set; } = true;
     internal bool DisplayItemsSummary { get; set; } = true;
-    internal bool NotifyStats { get; set; } = true;
+    internal bool NotifyProgressStats { get; set; } = true;
+    internal bool NotifyCompletionStats { get; set; } = true;
 
     internal TimeSpan ReportFrequency { get; set; } = TimeSpan.FromSeconds(1);
     internal TimeSpan StatsFrequency { get; set; } = TimeSpan.FromSeconds(5);
@@ -49,6 +55,7 @@ public class Reporter : IDisposable
     private string SuccessfulItems => _successCount.ToString().PadLeft(10);
     private string UnsuccessfulItems => _failureCount.ToString().PadLeft(10);
     private ulong CurrentCount => _successCount + _failureCount;
+
 
     internal Reporter(ulong itemsCount, Component component)
     {
@@ -90,7 +97,7 @@ public class Reporter : IDisposable
         _reportingThread = DoWork();
         _reportingThread.Start();
 
-        if (NotifyStats)
+        if (NotifyProgressStats)
         {
             _statsThread = DoStats();
             _statsThread.Start();
@@ -131,7 +138,7 @@ public class Reporter : IDisposable
         _reportingThread = DoWork();
         _reportingThread.Start();
 
-        if (NotifyStats)
+        if (NotifyProgressStats)
         {
             _statsThread = DoStats();
             _statsThread.Start();
@@ -241,23 +248,11 @@ public class Reporter : IDisposable
 
     private void ReportStats()
     {
-        if (OnStatsNotified == null || DateTimeOffset.UtcNow - _lastStatsNotification < StatsFrequency)
+        if (OnProgress == null || DateTimeOffset.UtcNow - _lastStatsNotification < StatsFrequency)
             return;
 
-        var stats = new Stats
-        {
-            StartedOn = _timer.StartedOn,
-            ElapsedTime = _timer.ElapsedTime,
-            RemainingTime = _timer.GetRemainingTime(_component.CurrentPercent.Value),
-            EstTimeOfArrival = _timer.GetEstimatedTimeOfArrival(_component.CurrentPercent.Value),
-            ExpectedItems = _itemsCount,
-            CurrentCount = CurrentCount,
-            SuccessCount = _successCount,
-            FailureCount = _failureCount,
-            CurrentPercent = _component.CurrentPercent.Value,
-        };
-
-        OnStatsNotified.Invoke(stats);
+        var stats = CollectStats();
+        OnProgress.Invoke(stats);
         _lastStatsNotification = DateTimeOffset.UtcNow;
     }
 
@@ -273,6 +268,12 @@ public class Reporter : IDisposable
             while (!IsFinished && !_cancellationToken.IsCancellationRequested);
 
             Display();
+
+            if (IsFinished && NotifyCompletionStats)
+            {
+                var stats = CollectStats();
+                OnCompletion?.Invoke(stats);
+            }
         });
 
         return new(tStart);
@@ -291,5 +292,21 @@ public class Reporter : IDisposable
         });
 
         return new(tStart);
+    }
+
+    private Stats CollectStats()
+    {
+        return new()
+        {
+            StartedOn = _timer.StartedOn,
+            ElapsedTime = _timer.ElapsedTime,
+            RemainingTime = _timer.GetRemainingTime(_component.CurrentPercent.Value),
+            EstTimeOfArrival = _timer.GetEstimatedTimeOfArrival(_component.CurrentPercent.Value),
+            ExpectedItems = _itemsCount,
+            CurrentCount = CurrentCount,
+            SuccessCount = _successCount,
+            FailureCount = _failureCount,
+            CurrentPercent = _component.CurrentPercent.Value,
+        };
     }
 }

@@ -2,9 +2,14 @@
 using Progress.Descriptors;
 using Progress.Samples;
 
-var onStatsNotified = (Stats stats) =>
+var onProgress = (Stats stats) =>
 {
-    // TODO: Implement collect
+    // TODO: Do something useful
+};
+
+var onCompletion = (Stats stats) =>
+{
+    // TODO: Do something useful
 };
 
 using var reporter = new ReporterBuilder()
@@ -14,7 +19,8 @@ using var reporter = new ReporterBuilder()
     .DisplayingRemainingTime()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
-    .NotifyingStats(onStatsNotified)
+    .NotifyingProgress(onProgress)
+    .NotifyingCompletion(onCompletion)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(BarDescriptor.Default)
     .Build(Worker.AllItems);

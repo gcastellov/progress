@@ -100,37 +100,54 @@ public class ReporterBuilderTests
     }
 
     [Fact]
-    public void GivenStatsNotifications_WhenBuilding_ThenReporterIsSetUp()
+    public void GivenProgressNotifications_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
         var callback = (Stats stats) => { };
         var builder = new ReporterBuilder()
-            .NotifyingStats(callback);
+            .NotifyingProgress(callback);
 
         // Act
         var actual = builder.Build(100);
 
         // Arrange
-        actual.OnStatsNotified.Should().NotBeNull();
-        actual.OnStatsNotified.Should().Be(callback);
+        actual.OnProgress.Should().NotBeNull();
+        actual.OnProgress.Should().Be(callback);
         actual.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
     }
 
     [Fact]
-    public void GivenStatsNotificationsWithFrequency_WhenBuilding_ThenReporterIsSetUp()
+    public void GivenProgressNotificationsWithFrequency_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
         var callback = (Stats stats) => { };
         var frequency = TimeSpan.FromSeconds(20);
         var builder = new ReporterBuilder()
-            .NotifyingStats(callback, frequency);
+            .NotifyingProgress(callback, frequency);
 
         // Act
         var actual = builder.Build(100);
 
         // Arrange
-        actual.OnStatsNotified.Should().NotBeNull();
-        actual.OnStatsNotified.Should().Be(callback);
+        actual.OnProgress.Should().NotBeNull();
+        actual.OnProgress.Should().Be(callback);
         actual.StatsFrequency.Should().Be(frequency);
     }
+
+    [Fact]
+    public void GivenCompletionNotifications_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        var callback = (Stats stats) => { };
+        var builder = new ReporterBuilder()
+            .NotifyingCompletion(callback);
+
+        // Act
+        var actual = builder.Build(100);
+
+        // Arrange
+        actual.OnCompletion.Should().NotBeNull();
+        actual.OnCompletion.Should().Be(callback);
+    }
+
 }

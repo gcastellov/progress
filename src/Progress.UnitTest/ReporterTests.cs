@@ -25,9 +25,12 @@ public class ReporterTests
         reporter.DisplayEstimatedTimeOfArrival.Should().BeTrue();
         reporter.DisplayItemsOverview.Should().BeTrue();
         reporter.DisplayItemsSummary.Should().BeTrue();
-        reporter.NotifyStats.Should().BeTrue();
+        reporter.NotifyProgressStats.Should().BeTrue();
+        reporter.NotifyCompletionStats.Should().BeTrue();
         reporter.ReportFrequency.Should().Be(TimeSpan.FromSeconds(1));
         reporter.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
+        reporter.OnProgress.Should().BeNull();
+        reporter.OnCompletion.Should().BeNull();
     }
 
     [Fact]
@@ -111,5 +114,48 @@ public class ReporterTests
 
         // Act
         reporter.Resume();
+    }
+
+    [Fact]
+    public async Task GivenProgressNotifications_WhenRunning_ThenCallbackIsCalled()
+    {
+        // Arrange
+        bool isCalled = false;
+        var reporter = new Reporter(100, BarDescriptor.Default.Build())
+        {
+            NotifyProgressStats = true,
+            StatsFrequency = TimeSpan.FromSeconds(1),
+            OnProgress = (stats) => isCalled = true
+        };
+        
+
+        // Act
+        reporter.Start();
+        await Task.Delay(TimeSpan.FromMilliseconds(1500));
+
+        // Assert
+        isCalled.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GivenCompletionNotifications_WhenFinished_ThenCallbackIsCalled()
+    {
+        // Arrange
+        bool isCalled = false;
+        var reporter = new Reporter(1, BarDescriptor.Default.Build())
+        {
+            NotifyCompletionStats = true,
+            ReportFrequency = TimeSpan.FromMicroseconds(500),
+            OnCompletion = (stats) => isCalled = true
+        };
+        
+        reporter.Start();
+
+        // Act
+        reporter.ReportSuccess();
+        await Task.Delay(TimeSpan.FromMilliseconds(1000));
+
+        // Assert
+        isCalled.Should().BeTrue();
     }
 }

@@ -8,12 +8,6 @@ Report progression with ease by using multilple components such as Bars, Spinner
 
 ```csharp
 using var reporter = new ReporterBuilder()
-    .DisplayingStartingTime()
-    .DisplayingElapsedTime()
-    .DisplayingTimeOfArrival()
-    .DisplayingRemainingTime()
-    .DisplayingItemsSummary()
-    .DisplayingItemsOverview()
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(BarDescriptor.Default)
     .Build(Worker.AllItems);
@@ -44,6 +38,14 @@ var descriptor = BarDescriptor.Default;
 ### Define the reporter to use the component
 ```csharp
 var reporter = new ReporterBuilder()
+    .DisplayingStartingTime()
+    .DisplayingElapsedTime()
+    .DisplayingTimeOfArrival()
+    .DisplayingRemainingTime()
+    .DisplayingItemsSummary()
+    .DisplayingItemsOverview()
+    .NotifyingProgress(onProgress)
+    .NotifyingCompletion(onCompletion)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(descriptor)
     .Build(Worker.AllItems);
@@ -58,4 +60,22 @@ reporter.Start();
 ```csharp
 reporter.ReportSuccess()
 reporter.ReportFailure()
+```
+
+### Collect stats while running
+```csharp
+var onProgress = (Stats stats) =>
+{
+    // TODO: Do something useful
+};
+
+var onCompletion = (Stats stats) =>
+{
+    // TODO: Do something useful
+};
+
+var reporter = new ReporterBuilder()
+    .NotifyingProgress(onProgress)
+    .NotifyingCompletion(onCompletion)
+    .Build(Worker.AllItems);
 ```
