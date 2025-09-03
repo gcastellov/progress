@@ -19,13 +19,25 @@ public class Reporter : IDisposable
     private Component _component;
     private Timer _timer;
     private Thread _reportingThread = default!;
+    private Thread _statsThread = default!;
     private CancellationTokenSource _cancellationTokenSource = default!;
     private CancellationToken _cancellationToken;
+    private DateTimeOffset _lastStatsNotification;
 
     /// <summary>
     /// Inidicates whehter the task is completed or not.
     /// </summary>
     public bool IsFinished => CurrentCount == _itemsCount;
+
+    /// <summary>
+    /// Gets or sets the progress notification hook which invocation happens during the operation.
+    /// </summary>
+    public Action<Stats>? OnProgress { get; set; } = null!;
+
+    /// <summary>
+    /// Gets or sets the completion hook which invocation happens at the end of the operation.
+    /// </summary>
+    public Action<Stats>? OnCompletion { get; set; } = null!;
 
     internal bool DisplayEstimatedTimeOfArrival { get; set; } = true;
     internal bool DisplayRemainingTime {  get; set; } = true;
@@ -33,12 +45,17 @@ public class Reporter : IDisposable
     internal bool DisplayStartingTime { get; set; } = true;
     internal bool DisplayItemsOverview { get; set; } = true;
     internal bool DisplayItemsSummary { get; set; } = true;
+    internal bool NotifyProgressStats { get; set; } = true;
+    internal bool NotifyCompletionStats { get; set; } = true;
+
     internal TimeSpan ReportFrequency { get; set; } = TimeSpan.FromSeconds(1);
+    internal TimeSpan StatsFrequency { get; set; } = TimeSpan.FromSeconds(5);
     
     private string AllItems => (_successCount + _failureCount).ToString().PadLeft(10);
     private string SuccessfulItems => _successCount.ToString().PadLeft(10);
     private string UnsuccessfulItems => _failureCount.ToString().PadLeft(10);
     private ulong CurrentCount => _successCount + _failureCount;
+
 
     internal Reporter(ulong itemsCount, Component component)
     {
@@ -73,11 +90,18 @@ public class Reporter : IDisposable
 
         _successCount = 0;
         _failureCount = 0;
+        _lastStatsNotification = DateTimeOffset.UtcNow;
         _timer = Timer.Start();
         _cancellationTokenSource = new CancellationTokenSource();
         _cancellationToken = _cancellationTokenSource.Token;
         _reportingThread = DoWork();
         _reportingThread.Start();
+
+        if (NotifyProgressStats)
+        {
+            _statsThread = DoStats();
+            _statsThread.Start();
+        }
     }
 
     /// <summary>
@@ -93,6 +117,9 @@ public class Reporter : IDisposable
 
         if (_reportingThread != null && _reportingThread.IsAlive)
             _reportingThread.Join();
+
+        if (_statsThread != null && _statsThread.IsAlive)
+            _statsThread.Join();
     }
 
     /// <summary>
@@ -110,6 +137,12 @@ public class Reporter : IDisposable
         _cancellationToken = _cancellationTokenSource.Token;
         _reportingThread = DoWork();
         _reportingThread.Start();
+
+        if (NotifyProgressStats)
+        {
+            _statsThread = DoStats();
+            _statsThread.Start();
+        }
     }
 
     /// <summary>
@@ -213,6 +246,16 @@ public class Reporter : IDisposable
         stream.Flush();
     }
 
+    private void ReportStats()
+    {
+        if (OnProgress == null || DateTimeOffset.UtcNow - _lastStatsNotification < StatsFrequency)
+            return;
+
+        var stats = CollectStats();
+        OnProgress.Invoke(stats);
+        _lastStatsNotification = DateTimeOffset.UtcNow;
+    }
+
     private Thread DoWork()
     {
         var tStart = new ThreadStart(() =>
@@ -225,8 +268,45 @@ public class Reporter : IDisposable
             while (!IsFinished && !_cancellationToken.IsCancellationRequested);
 
             Display();
+
+            if (IsFinished && NotifyCompletionStats)
+            {
+                var stats = CollectStats();
+                OnCompletion?.Invoke(stats);
+            }
         });
 
         return new(tStart);
+    }
+
+    private Thread DoStats()
+    {
+        var tStart = new ThreadStart(() => 
+        {
+            do
+            {
+                ReportStats();
+                Thread.Sleep(StatsFrequency);
+            }
+            while (!IsFinished && !_cancellationToken.IsCancellationRequested);
+        });
+
+        return new(tStart);
+    }
+
+    private Stats CollectStats()
+    {
+        return new()
+        {
+            StartedOn = _timer.StartedOn,
+            ElapsedTime = _timer.ElapsedTime,
+            RemainingTime = _timer.GetRemainingTime(_component.CurrentPercent.Value),
+            EstTimeOfArrival = _timer.GetEstimatedTimeOfArrival(_component.CurrentPercent.Value),
+            ExpectedItems = _itemsCount,
+            CurrentCount = CurrentCount,
+            SuccessCount = _successCount,
+            FailureCount = _failureCount,
+            CurrentPercent = _component.CurrentPercent.Value,
+        };
     }
 }

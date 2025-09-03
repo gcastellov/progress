@@ -2,6 +2,17 @@
 using Progress.Descriptors;
 using Progress.Samples;
 
+var onProgress = (Stats stats) =>
+{
+    // TODO: Do something useful
+};
+
+var onCompletion = (Stats stats) =>
+{
+    // TODO: Do something useful
+};
+
+
 using var reporter = new ReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
@@ -9,6 +20,8 @@ using var reporter = new ReporterBuilder()
     .DisplayingRemainingTime()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
+    .NotifyingProgress(onProgress)
+    .NotifyingCompletion(onCompletion)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(SpinnerDescriptor.Default)
     .Build(Worker.AllItems);

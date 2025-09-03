@@ -15,7 +15,10 @@ public class ReporterBuilder
     private bool _displayItemsOverview;
     private bool _displayItemsSummary;
     private TimeSpan _reportFrequency = TimeSpan.FromSeconds(1);
+    private TimeSpan _statsFrequency = TimeSpan.FromSeconds(5);
     private ComponentDescriptor _componentDescriptor = BarDescriptor.Default;
+    private Action<Stats> _onProgressNotified = default!;
+    private Action<Stats> _onCompletionNotified = default!;
 
     /// <summary>
     /// The reporter will display the elapsed time since the start.
@@ -101,6 +104,41 @@ public class ReporterBuilder
     }
 
     /// <summary>
+    /// Sets the progress notification callback.
+    /// Default notification frequency is set to 5 seconds.
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public ReporterBuilder NotifyingProgress(Action<Stats> callback)
+    {
+        return NotifyingProgress(callback, _statsFrequency);
+    }
+
+    /// <summary>
+    /// Sets the progress notification callback with the invocation frequency.
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <param name="statsFrequency"></param>
+    /// <returns></returns>
+    public ReporterBuilder NotifyingProgress(Action<Stats> callback, TimeSpan statsFrequency)
+    {
+        _onProgressNotified = callback;
+        _statsFrequency = statsFrequency;
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the completion notification callback.
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns></returns>
+    public ReporterBuilder NotifyingCompletion(Action<Stats> callback)
+    {
+        _onCompletionNotified = callback;
+        return this;
+    }
+
+    /// <summary>
     /// Builds the reporte getting an instance of <see cref="Reporter"/>.
     /// </summary>
     /// <param name="itemsCount"></param>
@@ -121,7 +159,12 @@ public class ReporterBuilder
             DisplayStartingTime = _displayStartingTime,
             DisplayItemsOverview = _displayItemsOverview,
             DisplayItemsSummary = _displayItemsSummary,
+            NotifyProgressStats = _onProgressNotified != null,
+            NotifyCompletionStats = _onCompletionNotified != null,
             ReportFrequency = _reportFrequency,
+            StatsFrequency = _statsFrequency,
+            OnProgress = _onProgressNotified,
+            OnCompletion = _onCompletionNotified
         };
     }
 }

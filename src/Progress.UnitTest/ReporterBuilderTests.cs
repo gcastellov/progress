@@ -98,4 +98,56 @@ public class ReporterBuilderTests
         // Assert
         actual.DisplayItemsSummary.Should().BeTrue();
     }
+
+    [Fact]
+    public void GivenProgressNotifications_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        var callback = (Stats stats) => { };
+        var builder = new ReporterBuilder()
+            .NotifyingProgress(callback);
+
+        // Act
+        var actual = builder.Build(100);
+
+        // Arrange
+        actual.OnProgress.Should().NotBeNull();
+        actual.OnProgress.Should().Be(callback);
+        actual.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public void GivenProgressNotificationsWithFrequency_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        var callback = (Stats stats) => { };
+        var frequency = TimeSpan.FromSeconds(20);
+        var builder = new ReporterBuilder()
+            .NotifyingProgress(callback, frequency);
+
+        // Act
+        var actual = builder.Build(100);
+
+        // Arrange
+        actual.OnProgress.Should().NotBeNull();
+        actual.OnProgress.Should().Be(callback);
+        actual.StatsFrequency.Should().Be(frequency);
+    }
+
+    [Fact]
+    public void GivenCompletionNotifications_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        var callback = (Stats stats) => { };
+        var builder = new ReporterBuilder()
+            .NotifyingCompletion(callback);
+
+        // Act
+        var actual = builder.Build(100);
+
+        // Arrange
+        actual.OnCompletion.Should().NotBeNull();
+        actual.OnCompletion.Should().Be(callback);
+    }
+
 }
