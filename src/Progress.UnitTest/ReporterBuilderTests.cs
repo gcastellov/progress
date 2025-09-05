@@ -1,4 +1,6 @@
-﻿namespace Progress.UnitTest;
+﻿using Progress.Settings;
+
+namespace Progress.UnitTest;
 
 public class ReporterBuilderTests
 {
@@ -132,6 +134,7 @@ public class ReporterBuilderTests
         actual.OnProgress.Should().NotBeNull();
         actual.OnProgress.Should().Be(callback);
         actual.Configuration.StatsFrequency.Should().Be(frequency);
+        actual.Configuration.Options.NotifyProgressStats.Should().BeTrue();
     }
 
     [Fact]
@@ -148,6 +151,25 @@ public class ReporterBuilderTests
         // Arrange
         actual.OnCompletion.Should().NotBeNull();
         actual.OnCompletion.Should().Be(callback);
+        actual.Configuration.Options.NotifyCompletionStats.Should().BeTrue();
     }
 
+    [Fact]
+    public void GivenExporting_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        const string fileName = "output.txt";
+        const FileType type = FileType.Text;
+        var builder = new ReporterBuilder()
+            .ExportingTo(fileName, type);
+
+        // Act
+        var actual = builder.Build(100);
+
+        // Assert
+        actual.Configuration.ExportSettings.Should().NotBeNull();
+        actual.Configuration.ExportSettings.FileName.Should().Be(fileName);
+        actual.Configuration.ExportSettings.FileType.Should().Be(FileType.Text);
+        actual.Configuration.Options.ExportCompletionStats.Should().BeTrue();
+    }
 }

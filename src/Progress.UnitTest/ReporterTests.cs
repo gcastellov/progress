@@ -18,15 +18,16 @@ public class ReporterTests
         // Arrange
         var reporter = new Reporter(100, BarDescriptor.Default.Build());
 
-        // Assert        
+        // Assert
         reporter.Configuration.Options.DisplayStartingTime.Should().BeTrue();
         reporter.Configuration.Options.DisplayRemainingTime.Should().BeTrue();
         reporter.Configuration.Options.DisplayElapsedTime.Should().BeTrue();
         reporter.Configuration.Options.DisplayEstimatedTimeOfArrival.Should().BeTrue();
         reporter.Configuration.Options.DisplayItemsOverview.Should().BeTrue();
         reporter.Configuration.Options.DisplayItemsSummary.Should().BeTrue();
-        reporter.Configuration.Options.NotifyProgressStats.Should().BeTrue();
-        reporter.Configuration.Options.NotifyCompletionStats.Should().BeTrue();
+        reporter.Configuration.Options.NotifyProgressStats.Should().BeFalse();
+        reporter.Configuration.Options.NotifyCompletionStats.Should().BeFalse();
+        reporter.Configuration.Options.ExportCompletionStats.Should().BeFalse();
         reporter.Configuration.ReportFrequency.Should().Be(TimeSpan.FromSeconds(1));
         reporter.Configuration.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
         reporter.Configuration.ExportSettings.Should().BeNull();

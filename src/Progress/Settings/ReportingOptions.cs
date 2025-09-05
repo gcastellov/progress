@@ -8,6 +8,7 @@ internal class ReportingOptions
     internal bool DisplayStartingTime { get; set; } = true;
     internal bool DisplayItemsOverview { get; set; } = true;
     internal bool DisplayItemsSummary { get; set; } = true;
-    internal bool NotifyProgressStats { get; set; } = true;
-    internal bool NotifyCompletionStats { get; set; } = true;
+    internal bool NotifyProgressStats { get; set; } = false;
+    internal bool NotifyCompletionStats { get; set; } = false;
+    internal bool ExportCompletionStats { get; set; } = false;
 }

@@ -1,6 +1,7 @@
 ﻿using Progress;
 using Progress.Descriptors;
 using Progress.Samples;
+using Progress.Settings;
 
 var onProgress = (Stats stats) =>
 {
@@ -22,6 +23,7 @@ using var reporter = new ReporterBuilder()
     .DisplayingItemsOverview()
     .NotifyingProgress(onProgress)
     .NotifyingCompletion(onCompletion)
+    .ExportingTo("output.txt", FileType.Text)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(PulseDescriptor.Default)
     .Build(Worker.AllItems);
