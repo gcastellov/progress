@@ -18,17 +18,18 @@ public class ReporterTests
         // Arrange
         var reporter = new Reporter(100, BarDescriptor.Default.Build());
 
-        // Assert
-        reporter.DisplayStartingTime.Should().BeTrue();
-        reporter.DisplayRemainingTime.Should().BeTrue();
-        reporter.DisplayElapsedTime.Should().BeTrue();
-        reporter.DisplayEstimatedTimeOfArrival.Should().BeTrue();
-        reporter.DisplayItemsOverview.Should().BeTrue();
-        reporter.DisplayItemsSummary.Should().BeTrue();
-        reporter.NotifyProgressStats.Should().BeTrue();
-        reporter.NotifyCompletionStats.Should().BeTrue();
-        reporter.ReportFrequency.Should().Be(TimeSpan.FromSeconds(1));
-        reporter.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
+        // Assert        
+        reporter.Configuration.Options.DisplayStartingTime.Should().BeTrue();
+        reporter.Configuration.Options.DisplayRemainingTime.Should().BeTrue();
+        reporter.Configuration.Options.DisplayElapsedTime.Should().BeTrue();
+        reporter.Configuration.Options.DisplayEstimatedTimeOfArrival.Should().BeTrue();
+        reporter.Configuration.Options.DisplayItemsOverview.Should().BeTrue();
+        reporter.Configuration.Options.DisplayItemsSummary.Should().BeTrue();
+        reporter.Configuration.Options.NotifyProgressStats.Should().BeTrue();
+        reporter.Configuration.Options.NotifyCompletionStats.Should().BeTrue();
+        reporter.Configuration.ReportFrequency.Should().Be(TimeSpan.FromSeconds(1));
+        reporter.Configuration.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
+        reporter.Configuration.ExportSettings.Should().BeNull();
         reporter.OnProgress.Should().BeNull();
         reporter.OnCompletion.Should().BeNull();
     }
@@ -123,10 +124,11 @@ public class ReporterTests
         bool isCalled = false;
         var reporter = new Reporter(100, BarDescriptor.Default.Build())
         {
-            NotifyProgressStats = true,
-            StatsFrequency = TimeSpan.FromSeconds(1),
             OnProgress = (stats) => isCalled = true
         };
+
+        reporter.Configuration.Options.NotifyProgressStats = true;
+        reporter.Configuration.StatsFrequency = TimeSpan.FromSeconds(1);
         
 
         // Act
@@ -144,10 +146,11 @@ public class ReporterTests
         bool isCalled = false;
         var reporter = new Reporter(1, BarDescriptor.Default.Build())
         {
-            NotifyCompletionStats = true,
-            ReportFrequency = TimeSpan.FromMicroseconds(500),
             OnCompletion = (stats) => isCalled = true
         };
+
+        reporter.Configuration.Options.NotifyCompletionStats = true;
+        reporter.Configuration.ReportFrequency = TimeSpan.FromMicroseconds(500);
         
         reporter.Start();
 

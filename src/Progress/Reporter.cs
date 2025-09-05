@@ -1,4 +1,5 @@
 ﻿using Progress.Components;
+using Progress.Settings;
 using System.Text;
 
 namespace Progress;
@@ -29,28 +30,10 @@ public class Reporter : IDisposable
     /// </summary>
     public bool IsFinished => CurrentCount == _itemsCount;
 
-    /// <summary>
-    /// Gets or sets the progress notification hook which invocation happens during the operation.
-    /// </summary>
-    public Action<Stats>? OnProgress { get; set; } = null!;
+    internal Configuration Configuration { get; set; } = new();
+    internal Action<Stats>? OnProgress { get; set; } = null!;
+    internal Action<Stats>? OnCompletion { get; set; } = null!;
 
-    /// <summary>
-    /// Gets or sets the completion hook which invocation happens at the end of the operation.
-    /// </summary>
-    public Action<Stats>? OnCompletion { get; set; } = null!;
-
-    internal bool DisplayEstimatedTimeOfArrival { get; set; } = true;
-    internal bool DisplayRemainingTime {  get; set; } = true;
-    internal bool DisplayElapsedTime { get; set; } = true;
-    internal bool DisplayStartingTime { get; set; } = true;
-    internal bool DisplayItemsOverview { get; set; } = true;
-    internal bool DisplayItemsSummary { get; set; } = true;
-    internal bool NotifyProgressStats { get; set; } = true;
-    internal bool NotifyCompletionStats { get; set; } = true;
-
-    internal TimeSpan ReportFrequency { get; set; } = TimeSpan.FromSeconds(1);
-    internal TimeSpan StatsFrequency { get; set; } = TimeSpan.FromSeconds(5);
-    
     private string AllItems => (_successCount + _failureCount).ToString().PadLeft(10);
     private string SuccessfulItems => _successCount.ToString().PadLeft(10);
     private string UnsuccessfulItems => _failureCount.ToString().PadLeft(10);
@@ -97,7 +80,7 @@ public class Reporter : IDisposable
         _reportingThread = DoWork();
         _reportingThread.Start();
 
-        if (NotifyProgressStats)
+        if (Configuration.Options.NotifyProgressStats)
         {
             _statsThread = DoStats();
             _statsThread.Start();
@@ -138,7 +121,7 @@ public class Reporter : IDisposable
         _reportingThread = DoWork();
         _reportingThread.Start();
 
-        if (NotifyProgressStats)
+        if (Configuration.Options.NotifyProgressStats)
         {
             _statsThread = DoStats();
             _statsThread.Start();
@@ -153,13 +136,13 @@ public class Reporter : IDisposable
     {
         StringBuilder sBuilder = new();
 
-        if (DisplayStartingTime)
+        if (Configuration.Options.DisplayStartingTime)
         {
             string label = "Process started at:".PadRight(RIGHT_PADDING);
             sBuilder.AppendLine($"{label} {_timer.StartedOn.ToString().PadLeft(LEFT_PADDING)}");
         }
 
-        if (DisplayEstimatedTimeOfArrival)
+        if (Configuration.Options.DisplayEstimatedTimeOfArrival)
         {
             string label = "ETA:".PadRight(RIGHT_PADDING);
             string value = _component.CurrentPercent.Value == 0
@@ -169,13 +152,13 @@ public class Reporter : IDisposable
             sBuilder.AppendLine($"{label} {value.PadLeft(LEFT_PADDING)}");
         }
 
-        if (DisplayElapsedTime)
+        if (Configuration.Options.DisplayElapsedTime)
         {
             string label = "Elapsed time:".PadRight(RIGHT_PADDING);
             sBuilder.AppendLine($"{label} {_timer.ElapsedTime.ToString().PadLeft(LEFT_PADDING)}");
         }
 
-        if (DisplayRemainingTime)
+        if (Configuration.Options.DisplayRemainingTime)
         {
             string label = "Remaining time:".PadRight(RIGHT_PADDING);
             string value = _component.CurrentPercent.Value == 0
@@ -185,7 +168,7 @@ public class Reporter : IDisposable
             sBuilder.AppendLine($"{label} {value.PadLeft(LEFT_PADDING)}");
         }
 
-        if (DisplayItemsSummary)
+        if (Configuration.Options.DisplayItemsSummary)
         {
             string successLabel = "Successful items:".PadRight(RIGHT_PADDING);
             string unsuccessLabel = "Unsuccessful items:".PadRight(RIGHT_PADDING);
@@ -193,7 +176,7 @@ public class Reporter : IDisposable
             sBuilder.AppendLine($"{unsuccessLabel} {UnsuccessfulItems.ToString().PadLeft(LEFT_PADDING)}");
         }
 
-        if (DisplayItemsOverview)
+        if (Configuration.Options.DisplayItemsOverview)
         {
             string label = "Total items:".PadRight(RIGHT_PADDING);
             sBuilder.AppendLine($"{label} {AllItems.ToString().PadLeft(LEFT_PADDING)}");
@@ -248,7 +231,7 @@ public class Reporter : IDisposable
 
     private void ReportStats()
     {
-        if (OnProgress == null || DateTimeOffset.UtcNow - _lastStatsNotification < StatsFrequency)
+        if (OnProgress == null || DateTimeOffset.UtcNow - _lastStatsNotification < Configuration.StatsFrequency)
             return;
 
         var stats = CollectStats();
@@ -263,13 +246,13 @@ public class Reporter : IDisposable
             do
             {
                 Display();
-                Thread.Sleep(ReportFrequency);
+                Thread.Sleep(Configuration.ReportFrequency);
             }
             while (!IsFinished && !_cancellationToken.IsCancellationRequested);
 
             Display();
 
-            if (IsFinished && NotifyCompletionStats)
+            if (IsFinished && Configuration.Options.NotifyCompletionStats)
             {
                 var stats = CollectStats();
                 OnCompletion?.Invoke(stats);
@@ -286,7 +269,7 @@ public class Reporter : IDisposable
             do
             {
                 ReportStats();
-                Thread.Sleep(StatsFrequency);
+                Thread.Sleep(Configuration.StatsFrequency);
             }
             while (!IsFinished && !_cancellationToken.IsCancellationRequested);
         });

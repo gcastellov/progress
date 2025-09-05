@@ -150,21 +150,24 @@ public class ReporterBuilder
             throw new ArgumentException("Nothing to do! Set the initial items count for completion.");
 
         var component = _componentDescriptor.Build();
-        
-        return new Reporter(itemsCount, component)
+
+        var reporter = new Reporter(itemsCount, component)
         {
-            DisplayRemainingTime = _displayRemainingTime,
-            DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival,
-            DisplayElapsedTime = _displayElapsedTime,
-            DisplayStartingTime = _displayStartingTime,
-            DisplayItemsOverview = _displayItemsOverview,
-            DisplayItemsSummary = _displayItemsSummary,
-            NotifyProgressStats = _onProgressNotified != null,
-            NotifyCompletionStats = _onCompletionNotified != null,
-            ReportFrequency = _reportFrequency,
-            StatsFrequency = _statsFrequency,
             OnProgress = _onProgressNotified,
             OnCompletion = _onCompletionNotified
         };
+
+        reporter.Configuration.ReportFrequency = _reportFrequency;
+        reporter.Configuration.StatsFrequency = _statsFrequency;
+        reporter.Configuration.Options.DisplayRemainingTime = _displayRemainingTime;
+        reporter.Configuration.Options.DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival;
+        reporter.Configuration.Options.DisplayElapsedTime = _displayElapsedTime;
+        reporter.Configuration.Options.DisplayStartingTime = _displayStartingTime;
+        reporter.Configuration.Options.DisplayItemsOverview = _displayItemsOverview;
+        reporter.Configuration.Options.DisplayItemsSummary = _displayItemsSummary;
+        reporter.Configuration.Options.NotifyProgressStats = _onProgressNotified != null;
+        reporter.Configuration.Options.NotifyCompletionStats = _onCompletionNotified != null;
+
+        return reporter;
     }
 }
