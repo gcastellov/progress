@@ -16,7 +16,11 @@ public enum FileType
     /// <summary>
     /// JSON
     /// </summary>
-    Json
+    Json,
+    /// <summary>
+    /// XML
+    /// </summary>
+    Xml
 }
 
 internal record ExportSettings(string FileName, FileType FileType);

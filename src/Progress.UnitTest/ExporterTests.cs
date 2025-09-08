@@ -22,6 +22,7 @@ public class ExporterTests
     [InlineData("output.csv", FileType.Csv)]
     [InlineData("output.json", FileType.Json)]
     [InlineData("output.txt", FileType.Text)]
+    [InlineData("output.xml", FileType.Xml)]
     public void GivenStats_WhenExporting_ThenExportsSuccessfully(string fileName, FileType fileType)
     {
         // Arrange

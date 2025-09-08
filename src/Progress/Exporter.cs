@@ -10,7 +10,7 @@ namespace Progress;
 internal class Exporter(ExportSettings settings)
 {
     private readonly ExportSettings _settings = settings;
-    private readonly IEnumerable<IContentExporter> _exporters = [ new CsvExporter(), new TextExporter(), new JsonExporter() ];
+    private readonly IEnumerable<IContentExporter> _exporters = [ new CsvExporter(), new TextExporter(), new JsonExporter(), new XmlExporter() ];
 
     public void Export(Stats stats)
     {
