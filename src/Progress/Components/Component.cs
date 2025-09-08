@@ -6,7 +6,7 @@ internal abstract class Component
 {
     private static readonly CultureInfo Culture = new("en-US");
 
-    public Percent CurrentPercent { get; protected set; } = default!;
+    public Percent CurrentPercent { get; protected set; } = Percent.Zero;
 
     public abstract Component Next(ulong availableItems, ulong currentCount);
 
@@ -14,6 +14,8 @@ internal abstract class Component
 
     internal class Percent
     {
+        public static Percent Zero => new(0, 0);
+
         private readonly double _percent;
         
         public Percent(ulong items, ulong count)
