@@ -9,9 +9,6 @@ namespace Progress;
 /// </summary>
 public class Reporter : IDisposable
 {
-    private const int Left_Padding = 30;
-    private const int Right_Padding = 20;
-
     private readonly ulong _itemsCount;
     private readonly Configuration _configuration;
 
@@ -20,6 +17,7 @@ public class Reporter : IDisposable
     private ulong _failureCount;
     private Component _component;
     private Timer _timer;
+    private Printer _printer;
     private Thread _reportingThread = default!;
     private Thread _statsThread = default!;
     private CancellationTokenSource _cancellationTokenSource = default!;
@@ -35,9 +33,6 @@ public class Reporter : IDisposable
     internal Action<Stats>? OnProgress { get; set; } = null!;
     internal Action<Stats>? OnCompletion { get; set; } = null!;
 
-    private string AllItems => (_successCount + _failureCount).ToString().PadLeft(10);
-    private string SuccessfulItems => _successCount.ToString().PadLeft(10);
-    private string UnsuccessfulItems => _failureCount.ToString().PadLeft(10);
     private ulong CurrentCount => _successCount + _failureCount;
 
 
@@ -53,6 +48,7 @@ public class Reporter : IDisposable
         _component = component;
         _timer = Timer.Start();
         _configuration = new Configuration();
+        _printer = new Printer(Configuration.Options, component);
     }
 
     /// <summary>
@@ -136,57 +132,8 @@ public class Reporter : IDisposable
     /// <returns></returns>
     public override string ToString()
     {
-        StringBuilder sBuilder = new();
-
-        if (Configuration.Options.DisplayStartingTime)
-        {
-            string label = "Process started at:".PadRight(Right_Padding);
-            sBuilder.AppendLine($"{label} {_timer.StartedOn.ToString().PadLeft(Left_Padding)}");
-        }
-
-        if (Configuration.Options.DisplayEstimatedTimeOfArrival)
-        {
-            string label = "ETA:".PadRight(Right_Padding);
-            string value = _component.CurrentPercent.Value == 0
-                ? Timer.Unknowm
-                : _timer.GetEstimatedTimeOfArrival(_component.CurrentPercent.Value).ToString();
-                
-            sBuilder.AppendLine($"{label} {value.PadLeft(Left_Padding)}");
-        }
-
-        if (Configuration.Options.DisplayElapsedTime)
-        {
-            string label = "Elapsed time:".PadRight(Right_Padding);
-            sBuilder.AppendLine($"{label} {_timer.ElapsedTime.ToString().PadLeft(Left_Padding)}");
-        }
-
-        if (Configuration.Options.DisplayRemainingTime)
-        {
-            string label = "Remaining time:".PadRight(Right_Padding);
-            string value = _component.CurrentPercent.Value == 0
-                ? Timer.Unknowm
-                : _timer.GetRemainingTime(_component.CurrentPercent.Value).ToString();
-
-            sBuilder.AppendLine($"{label} {value.PadLeft(Left_Padding)}");
-        }
-
-        if (Configuration.Options.DisplayItemsSummary)
-        {
-            string successLabel = "Successful items:".PadRight(Right_Padding);
-            string unsuccessLabel = "Unsuccessful items:".PadRight(Right_Padding);
-            sBuilder.AppendLine($"{successLabel} {SuccessfulItems.ToString().PadLeft(Left_Padding)}");
-            sBuilder.AppendLine($"{unsuccessLabel} {UnsuccessfulItems.ToString().PadLeft(Left_Padding)}");
-        }
-
-        if (Configuration.Options.DisplayItemsOverview)
-        {
-            string label = "Total items:".PadRight(Right_Padding);
-            sBuilder.AppendLine($"{label} {AllItems.ToString().PadLeft(Left_Padding)}");
-        }
-
-        sBuilder.AppendLine();
-        sBuilder.AppendLine(_component.ToString());            
-        return sBuilder.ToString();
+        var stats = CollectStats();
+        return _printer.Print(stats);
     }
 
     /// <summary>
