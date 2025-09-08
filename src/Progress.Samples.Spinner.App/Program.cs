@@ -22,6 +22,7 @@ using var reporter = new ReporterBuilder()
     .DisplayingItemsOverview()
     .NotifyingProgress(onProgress)
     .NotifyingCompletion(onCompletion)
+    .ExportingTo("output.xml", Progress.Settings.FileType.Xml)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(SpinnerDescriptor.Default)
     .Build(Worker.AllItems);

@@ -1,4 +1,5 @@
 ﻿using Progress.Descriptors;
+using Progress.Settings;
 
 namespace Progress;
 
@@ -17,6 +18,7 @@ public class ReporterBuilder
     private TimeSpan _reportFrequency = TimeSpan.FromSeconds(1);
     private TimeSpan _statsFrequency = TimeSpan.FromSeconds(5);
     private ComponentDescriptor _componentDescriptor = BarDescriptor.Default;
+    private ExportSettings _exportSettings = default!;
     private Action<Stats> _onProgressNotified = default!;
     private Action<Stats> _onCompletionNotified = default!;
 
@@ -139,6 +141,18 @@ public class ReporterBuilder
     }
 
     /// <summary>
+    /// Sets and tells the reporter how and where to export the final stats.
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="fileType"></param>
+    /// <returns></returns>
+    public ReporterBuilder ExportingTo(string fileName, FileType fileType)
+    {
+        _exportSettings = new ExportSettings(fileName, fileType);
+        return this;
+    }
+
+    /// <summary>
     /// Builds the reporte getting an instance of <see cref="Reporter"/>.
     /// </summary>
     /// <param name="itemsCount"></param>
@@ -150,21 +164,26 @@ public class ReporterBuilder
             throw new ArgumentException("Nothing to do! Set the initial items count for completion.");
 
         var component = _componentDescriptor.Build();
-        
-        return new Reporter(itemsCount, component)
+
+        var reporter = new Reporter(itemsCount, component)
         {
-            DisplayRemainingTime = _displayRemainingTime,
-            DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival,
-            DisplayElapsedTime = _displayElapsedTime,
-            DisplayStartingTime = _displayStartingTime,
-            DisplayItemsOverview = _displayItemsOverview,
-            DisplayItemsSummary = _displayItemsSummary,
-            NotifyProgressStats = _onProgressNotified != null,
-            NotifyCompletionStats = _onCompletionNotified != null,
-            ReportFrequency = _reportFrequency,
-            StatsFrequency = _statsFrequency,
             OnProgress = _onProgressNotified,
             OnCompletion = _onCompletionNotified
         };
+
+        reporter.Configuration.ReportFrequency = _reportFrequency;
+        reporter.Configuration.StatsFrequency = _statsFrequency;
+        reporter.Configuration.ExportSettings = _exportSettings;
+        reporter.Configuration.Options.DisplayRemainingTime = _displayRemainingTime;
+        reporter.Configuration.Options.DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival;
+        reporter.Configuration.Options.DisplayElapsedTime = _displayElapsedTime;
+        reporter.Configuration.Options.DisplayStartingTime = _displayStartingTime;
+        reporter.Configuration.Options.DisplayItemsOverview = _displayItemsOverview;
+        reporter.Configuration.Options.DisplayItemsSummary = _displayItemsSummary;
+        reporter.Configuration.Options.NotifyProgressStats = _onProgressNotified != null;
+        reporter.Configuration.Options.NotifyCompletionStats = _onCompletionNotified != null;
+        reporter.Configuration.Options.ExportCompletionStats = _exportSettings != null;
+
+        return reporter;
     }
 }

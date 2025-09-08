@@ -1,4 +1,6 @@
-﻿namespace Progress.UnitTest;
+﻿using Progress.Settings;
+
+namespace Progress.UnitTest;
 
 public class ReporterBuilderTests
 {
@@ -37,7 +39,7 @@ public class ReporterBuilderTests
             .UsingReportingFrequency(expectedFrequency);
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build(100).Configuration;
 
         // Assert
         actual.ReportFrequency.Should().Be(expectedFrequency);
@@ -51,7 +53,7 @@ public class ReporterBuilderTests
             .DisplayingElapsedTime();
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build(100).Configuration.Options;
 
         // Assert
         actual.DisplayElapsedTime.Should().BeTrue();
@@ -65,7 +67,7 @@ public class ReporterBuilderTests
             .DisplayingStartingTime();
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build(100).Configuration.Options;
 
         // Assert
         actual.DisplayStartingTime.Should().BeTrue();
@@ -79,7 +81,7 @@ public class ReporterBuilderTests
             .DisplayingItemsOverview();
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build(100).Configuration.Options;
 
         // Assert
         actual.DisplayItemsOverview.Should().BeTrue();
@@ -93,7 +95,7 @@ public class ReporterBuilderTests
             .DisplayingItemsSummary();
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build(100).Configuration.Options;
 
         // Assert
         actual.DisplayItemsSummary.Should().BeTrue();
@@ -113,7 +115,7 @@ public class ReporterBuilderTests
         // Arrange
         actual.OnProgress.Should().NotBeNull();
         actual.OnProgress.Should().Be(callback);
-        actual.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
+        actual.Configuration.StatsFrequency.Should().Be(TimeSpan.FromSeconds(5));
     }
 
     [Fact]
@@ -131,7 +133,8 @@ public class ReporterBuilderTests
         // Arrange
         actual.OnProgress.Should().NotBeNull();
         actual.OnProgress.Should().Be(callback);
-        actual.StatsFrequency.Should().Be(frequency);
+        actual.Configuration.StatsFrequency.Should().Be(frequency);
+        actual.Configuration.Options.NotifyProgressStats.Should().BeTrue();
     }
 
     [Fact]
@@ -148,6 +151,25 @@ public class ReporterBuilderTests
         // Arrange
         actual.OnCompletion.Should().NotBeNull();
         actual.OnCompletion.Should().Be(callback);
+        actual.Configuration.Options.NotifyCompletionStats.Should().BeTrue();
     }
 
+    [Fact]
+    public void GivenExporting_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        const string fileName = "output.txt";
+        const FileType type = FileType.Text;
+        var builder = new ReporterBuilder()
+            .ExportingTo(fileName, type);
+
+        // Act
+        var actual = builder.Build(100);
+
+        // Assert
+        actual.Configuration.ExportSettings.Should().NotBeNull();
+        actual.Configuration.ExportSettings.FileName.Should().Be(fileName);
+        actual.Configuration.ExportSettings.FileType.Should().Be(FileType.Text);
+        actual.Configuration.Options.ExportCompletionStats.Should().BeTrue();
+    }
 }
