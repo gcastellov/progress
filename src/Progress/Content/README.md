@@ -45,6 +45,7 @@ var reporter = new ReporterBuilder()
     .DisplayingItemsOverview()
     .NotifyingProgress(onProgress)
     .NotifyingCompletion(onCompletion)
+    .ExportingTo("output.json", FileType.Json)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(BarDescriptor.Default)
     .Build(Worker.AllItems);
@@ -86,5 +87,13 @@ var onCompletion = (Stats stats) =>
 var reporter = new ReporterBuilder()
     .NotifyingProgress(onProgress)
     .NotifyingCompletion(onCompletion)
+    .Build(Worker.AllItems);
+```
+
+
+### Exports final stats (json, csv, xml, txt)
+```csharp
+var reporter = new ReporterBuilder()
+    .ExportingTo("output.json", FileType.Json)
     .Build(Worker.AllItems);
 ```
