@@ -1,4 +1,5 @@
 ﻿using Progress;
+using Progress.Builders;
 using Progress.Descriptors;
 using Progress.Samples;
 using Progress.Settings;
@@ -13,7 +14,7 @@ var onCompletion = (Stats stats) =>
     // TODO: Do something useful
 };
 
-using var reporter = new ReporterBuilder()
+using var reporter = new ConsoleReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
     .DisplayingTimeOfArrival()

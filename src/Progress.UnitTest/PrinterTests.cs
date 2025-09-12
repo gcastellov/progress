@@ -8,7 +8,7 @@ public class PrinterTests
     public void GivenDefaults_WhenPrinting_ThenGetsOutput()
     {
         // Arrange
-        Printer printer = new(new Settings.ReportingOptions(), BarDescriptor.Default.Build());
+        Printer printer = new(new Settings.Console.ReportingOptions(), BarDescriptor.Default.Build());
         Stats stats = new();
 
         // Act

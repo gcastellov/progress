@@ -1,13 +1,14 @@
 ﻿using Progress.Descriptors;
+using Progress.Reporters;
 using Progress.Settings;
 
-namespace Progress;
+namespace Progress.Builders;
 
 /// <summary>
-/// Builder for helping to set up the reported with the desired behavior.
-/// It will create an instance of <see cref="Reporter"/> using a <see cref="BarDescriptor"/> by default.
+/// Builder for helping to set up the console reporter with the desired behavior.
+/// It will create an instance of <see cref="ConsoleReporter"/> using a <see cref="BarDescriptor"/> by default.
 /// </summary>
-public class ReporterBuilder
+public class ConsoleReporterBuilder
 {
     private bool _displayRemainingTime;
     private bool _displayEstTimeOfArrival;
@@ -26,7 +27,7 @@ public class ReporterBuilder
     /// The reporter will display the elapsed time since the start.
     /// </summary>
     /// <returns></returns>
-    public ReporterBuilder DisplayingElapsedTime()
+    public ConsoleReporterBuilder DisplayingElapsedTime()
     {
         _displayElapsedTime = true;
         return this;
@@ -36,7 +37,7 @@ public class ReporterBuilder
     /// The reporter will display the remaining time to finish.
     /// </summary>
     /// <returns></returns>
-    public ReporterBuilder DisplayingRemainingTime()
+    public ConsoleReporterBuilder DisplayingRemainingTime()
     {
         _displayRemainingTime = true;
         return this;
@@ -46,7 +47,7 @@ public class ReporterBuilder
     /// The reporter will display when the operation is expected to finish.
     /// </summary>
     /// <returns></returns>
-    public ReporterBuilder DisplayingTimeOfArrival()
+    public ConsoleReporterBuilder DisplayingTimeOfArrival()
     {
         _displayEstTimeOfArrival = true;
         return this;
@@ -56,7 +57,7 @@ public class ReporterBuilder
     /// The reporter will display when the operation started.
     /// </summary>
     /// <returns></returns>
-    public ReporterBuilder DisplayingStartingTime()
+    public ConsoleReporterBuilder DisplayingStartingTime()
     {
         _displayStartingTime = true;
         return this;
@@ -66,7 +67,7 @@ public class ReporterBuilder
     /// The rerporter will display the total of items processed.
     /// </summary>
     /// <returns></returns>
-    public ReporterBuilder DisplayingItemsOverview()
+    public ConsoleReporterBuilder DisplayingItemsOverview()
     {
         _displayItemsOverview = true;
         return this;
@@ -76,7 +77,7 @@ public class ReporterBuilder
     /// The reporter will display the amount of success and failures.
     /// </summary>
     /// <returns></returns>
-    public ReporterBuilder DisplayingItemsSummary()
+    public ConsoleReporterBuilder DisplayingItemsSummary()
     {
         _displayItemsSummary = true;
         return this;
@@ -88,7 +89,7 @@ public class ReporterBuilder
     /// </summary>
     /// <param name="frequency"></param>
     /// <returns></returns>
-    public ReporterBuilder UsingReportingFrequency(TimeSpan frequency)
+    public ConsoleReporterBuilder UsingReportingFrequency(TimeSpan frequency)
     {
         _reportFrequency = frequency;
         return this;
@@ -99,7 +100,7 @@ public class ReporterBuilder
     /// </summary>
     /// <param name="descriptor"></param>
     /// <returns></returns>
-    public ReporterBuilder UsingComponentDescriptor(ComponentDescriptor descriptor)
+    public ConsoleReporterBuilder UsingComponentDescriptor(ComponentDescriptor descriptor)
     {
         _componentDescriptor = descriptor;
         return this;
@@ -111,7 +112,7 @@ public class ReporterBuilder
     /// </summary>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public ReporterBuilder NotifyingProgress(Action<Stats> callback)
+    public ConsoleReporterBuilder NotifyingProgress(Action<Stats> callback)
     {
         return NotifyingProgress(callback, _statsFrequency);
     }
@@ -122,7 +123,7 @@ public class ReporterBuilder
     /// <param name="callback"></param>
     /// <param name="statsFrequency"></param>
     /// <returns></returns>
-    public ReporterBuilder NotifyingProgress(Action<Stats> callback, TimeSpan statsFrequency)
+    public ConsoleReporterBuilder NotifyingProgress(Action<Stats> callback, TimeSpan statsFrequency)
     {
         _onProgressNotified = callback;
         _statsFrequency = statsFrequency;
@@ -134,7 +135,7 @@ public class ReporterBuilder
     /// </summary>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public ReporterBuilder NotifyingCompletion(Action<Stats> callback)
+    public ConsoleReporterBuilder NotifyingCompletion(Action<Stats> callback)
     {
         _onCompletionNotified = callback;
         return this;
@@ -146,26 +147,26 @@ public class ReporterBuilder
     /// <param name="fileName"></param>
     /// <param name="fileType"></param>
     /// <returns></returns>
-    public ReporterBuilder ExportingTo(string fileName, FileType fileType)
+    public ConsoleReporterBuilder ExportingTo(string fileName, FileType fileType)
     {
         _exportSettings = new ExportSettings(fileName, fileType);
         return this;
     }
 
     /// <summary>
-    /// Builds the reporte getting an instance of <see cref="Reporter"/>.
+    /// Builds the reporter getting an instance of <see cref="ConsoleReporter"/>.
     /// </summary>
     /// <param name="itemsCount"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public Reporter Build(ulong itemsCount)
+    public ConsoleReporter Build(ulong itemsCount)
     {
         if (itemsCount == 0)
             throw new ArgumentException("Nothing to do! Set the initial items count for completion.");
 
         var component = _componentDescriptor.Build();
 
-        var reporter = new Reporter(itemsCount, component)
+        var reporter = new ConsoleReporter(itemsCount, component)
         {
             OnProgress = _onProgressNotified,
             OnCompletion = _onCompletionNotified

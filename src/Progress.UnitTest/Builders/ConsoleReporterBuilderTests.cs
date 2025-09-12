@@ -1,14 +1,15 @@
-﻿using Progress.Settings;
+﻿using Progress.Builders;
+using Progress.Settings;
 
-namespace Progress.UnitTest;
+namespace Progress.UnitTest.Builders;
 
-public class ReporterBuilderTests
+public class ConsoleReporterBuilderTests
 {
     [Fact]
     public void GivenNothingToComplete_WhenBuilding_ThenThrowsException()
     {
         // Arrange
-        var builder = new ReporterBuilder();
+        var builder = new ConsoleReporterBuilder();
 
         // Act
         var action = () => builder.Build(0);
@@ -21,7 +22,7 @@ public class ReporterBuilderTests
     public void GivenSomethingToComplete_WhenBuilding_ThenReturnsReporter()
     {
         // Arrange
-        var builder = new ReporterBuilder();
+        var builder = new ConsoleReporterBuilder();
 
         // Act
         var actual = builder.Build(100);
@@ -35,7 +36,7 @@ public class ReporterBuilderTests
     {
         // Arrange
         var expectedFrequency = TimeSpan.FromSeconds(20);
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .UsingReportingFrequency(expectedFrequency);
 
         // Act
@@ -49,7 +50,7 @@ public class ReporterBuilderTests
     public void GivenElapsedTime_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .DisplayingElapsedTime();
 
         // Act
@@ -63,7 +64,7 @@ public class ReporterBuilderTests
     public void GivenStartingTime_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .DisplayingStartingTime();
 
         // Act
@@ -77,7 +78,7 @@ public class ReporterBuilderTests
     public void GivenItemsOverview_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .DisplayingItemsOverview();
 
         // Act
@@ -91,7 +92,7 @@ public class ReporterBuilderTests
     public void GivenSummary_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .DisplayingItemsSummary();
 
         // Act
@@ -106,7 +107,7 @@ public class ReporterBuilderTests
     {
         // Arrange
         var callback = (Stats stats) => { };
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .NotifyingProgress(callback);
 
         // Act
@@ -124,7 +125,7 @@ public class ReporterBuilderTests
         // Arrange
         var callback = (Stats stats) => { };
         var frequency = TimeSpan.FromSeconds(20);
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .NotifyingProgress(callback, frequency);
 
         // Act
@@ -142,7 +143,7 @@ public class ReporterBuilderTests
     {
         // Arrange
         var callback = (Stats stats) => { };
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .NotifyingCompletion(callback);
 
         // Act
@@ -160,7 +161,7 @@ public class ReporterBuilderTests
         // Arrange
         const string fileName = "output.txt";
         const FileType type = FileType.Text;
-        var builder = new ReporterBuilder()
+        var builder = new ConsoleReporterBuilder()
             .ExportingTo(fileName, type);
 
         // Act

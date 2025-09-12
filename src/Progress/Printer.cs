@@ -1,5 +1,5 @@
 ﻿using Progress.Components;
-using Progress.Settings;
+using Progress.Settings.Console;
 using System.Text;
 
 namespace Progress;

@@ -1,13 +1,13 @@
 ﻿using Progress.Components;
-using Progress.Settings;
+using Progress.Settings.Console;
 using System.Text;
 
-namespace Progress;
+namespace Progress.Reporters;
 
 /// <summary>
-/// Reports background task completion based on the settings provided.
+/// Reports background task's progress to console based on the settings provided.
 /// </summary>
-public class Reporter : IDisposable
+public class ConsoleReporter : IDisposable
 {
     private readonly ulong _itemsCount;
     private readonly Configuration _configuration;
@@ -36,7 +36,7 @@ public class Reporter : IDisposable
     private ulong CurrentCount => _successCount + _failureCount;
 
 
-    internal Reporter(ulong itemsCount, Component component)
+    internal ConsoleReporter(ulong itemsCount, Component component)
     {
         if (itemsCount == 0)
             throw new ArgumentException($"Nothing to do!. {nameof(itemsCount)} must be greater than 0");

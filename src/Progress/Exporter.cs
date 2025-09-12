@@ -10,7 +10,13 @@ namespace Progress;
 internal class Exporter(ExportSettings settings)
 {
     private readonly ExportSettings _settings = settings;
-    private readonly IEnumerable<IContentExporter> _exporters = [ new CsvExporter(), new TextExporter(), new JsonExporter(), new XmlExporter() ];
+    private readonly IEnumerable<IContentExporter> _exporters = 
+    [ 
+        new CsvExporter(), 
+        new TextExporter(),
+        new JsonExporter(),
+        new XmlExporter()
+    ];
 
     public void Export(Stats stats)
     {
@@ -18,9 +24,13 @@ internal class Exporter(ExportSettings settings)
             ? File.OpenWrite(_settings.FileName)
             : File.Create(_settings.FileName);
 
+        using StreamWriter writer = new(stream);
+
         IContentExporter contentExporter = _exporters.FirstOrDefault(e => e.FileType == _settings.FileType) ?? throw new NotSupportedException("Not supported export type");
         string content = contentExporter.Export(stats);
-        byte[] result = Encoding.Default.GetBytes(content);
-        stream.Write(result, 0, result.Length);
+        writer.Write(content);
+        stream.Flush(true);
+        writer.Close();
+        stream.Close();
     }
 }

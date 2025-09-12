@@ -1,4 +1,4 @@
-﻿namespace Progress.Settings;
+﻿namespace Progress.Settings.Console;
 
 internal class Configuration
 {
