@@ -7,19 +7,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress", "Progress\Progre
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Bar.App", "Progress.Samples.Bar.App\Progress.Samples.Bar.App.csproj", "{256B943E-F24D-44C8-A667-34F025A60AC7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Bar.App", "Samples\Progress.Samples.Bar.App\Progress.Samples.Bar.App.csproj", "{256B943E-F24D-44C8-A667-34F025A60AC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples", "Progress.Samples\Progress.Samples.csproj", "{FEDB17DF-27B4-407C-A225-0DBAA1157715}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples", "Samples\Progress.Samples\Progress.Samples.csproj", "{FEDB17DF-27B4-407C-A225-0DBAA1157715}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Spinner.App", "Progress.Samples.Spinner.App\Progress.Samples.Spinner.App.csproj", "{BDD1AF4C-9905-4D5F-9020-07CDE449E7F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Spinner.App", "Samples\Progress.Samples.Spinner.App\Progress.Samples.Spinner.App.csproj", "{BDD1AF4C-9905-4D5F-9020-07CDE449E7F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Pulse.App", "Progress.Samples.Pulse.App\Progress.Samples.Pulse.App.csproj", "{8B3E0D5B-ABBB-45D6-B0BA-25EDB15D2502}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Pulse.App", "Samples\Progress.Samples.Pulse.App\Progress.Samples.Pulse.App.csproj", "{8B3E0D5B-ABBB-45D6-B0BA-25EDB15D2502}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.HearthBeat.App", "Progress.Samples.HearthBeat.App\Progress.Samples.HearthBeat.App.csproj", "{8DEBB035-B737-4C7D-9706-400914D06FC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.HearthBeat.App", "Samples\Progress.Samples.HearthBeat.App\Progress.Samples.HearthBeat.App.csproj", "{8DEBB035-B737-4C7D-9706-400914D06FC3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.UnitTest", "Progress.UnitTest\Progress.UnitTest.csproj", "{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Background.Api", "Progress.Samples.Background.Api\Progress.Samples.Background.Api.csproj", "{DDFD6BC0-2650-4289-81AD-23B2AF96C405}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Progress.Samples.Background.Api", "Samples\Progress.Samples.Background.Api\Progress.Samples.Background.Api.csproj", "{DDFD6BC0-2650-4289-81AD-23B2AF96C405}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{45A524E0-71BD-4A1A-8720-80D36E0F5630}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,7 @@ Global
 		{BDD1AF4C-9905-4D5F-9020-07CDE449E7F7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{8B3E0D5B-ABBB-45D6-B0BA-25EDB15D2502} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{8DEBB035-B737-4C7D-9706-400914D06FC3} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{4ACE65FC-B0A8-45E8-9A46-99DD8E5AA447} = {45A524E0-71BD-4A1A-8720-80D36E0F5630}
 		{DDFD6BC0-2650-4289-81AD-23B2AF96C405} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
