@@ -1,4 +1,5 @@
 # Progress
+[![.NET](https://github.com/gcastellov/progress/actions/workflows/dotnet.yml/badge.svg)](https://github.com/gcastellov/progress/actions/workflows/dotnet.yml)
 
 This library helps you to spin up reporters for giving an overview of a workload's progression. These reporters can either be for console apps that output the information or background jobs hosted by APIs handling the progress via hooks. 
 
