@@ -1,6 +1,8 @@
 ﻿using Progress;
+using Progress.Builders;
 using Progress.Descriptors;
 using Progress.Samples;
+using Progress.Settings;
 
 var onProgress = (Stats stats) =>
 {
@@ -12,8 +14,7 @@ var onCompletion = (Stats stats) =>
     // TODO: Do something useful
 };
 
-
-using var reporter = new ReporterBuilder()
+using var reporter = new ConsoleReporterBuilder()
     .DisplayingStartingTime()
     .DisplayingElapsedTime()
     .DisplayingTimeOfArrival()
@@ -22,9 +23,9 @@ using var reporter = new ReporterBuilder()
     .DisplayingItemsOverview()
     .NotifyingProgress(onProgress)
     .NotifyingCompletion(onCompletion)
-    .ExportingTo("output.xml", Progress.Settings.FileType.Xml)
+    .ExportingTo("output.json", FileType.Json)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-    .UsingComponentDescriptor(SpinnerDescriptor.Default)
+    .UsingComponentDescriptor(BarDescriptor.Default)
     .Build(Worker.AllItems);
 
 var worker = new Worker()

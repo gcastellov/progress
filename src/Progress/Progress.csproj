@@ -9,16 +9,16 @@
 
 	<PropertyGroup>
 		<PackageId>Progress</PackageId>
-		<Version>1.4.0</Version>
+		<Version>2.0.0</Version>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>Gerard Castello</Authors>
 		<Title>Report progress with ease</Title>
-		<Description>Report progression with ease by using multilple components such as Bars, Spinners, Pulse and more</Description>
+		<Description>Report workload progression with ease by using multilple components such as Bars, Spinners, Pulse and more</Description>
 		<PackageIcon>Content/logo.png</PackageIcon>
 		<PackageReadmeFile>Content/README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/gcastellov/progress</RepositoryUrl>
-		<PackageTags>dotnet, report, progress, background, console</PackageTags>
-	</PropertyGroup>	
+		<PackageTags>dotnet, report, workload, progress, background, console</PackageTags>
+	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>

@@ -10,7 +10,7 @@ internal abstract class Component
 
     public abstract Component Next(ulong availableItems, ulong currentCount);
 
-    protected static Percent Calculate(ulong availableItems, ulong currentCount) => new(availableItems, currentCount);
+    public static Percent Calculate(ulong availableItems, ulong currentCount) => new(availableItems, currentCount);
 
     internal class Percent
     {

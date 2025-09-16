@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Progress.Samples\Progress.Samples.csproj" />
-    <ProjectReference Include="..\Progress\Progress.csproj" />
+    <ProjectReference Include="..\..\Progress\Progress.csproj" />
   </ItemGroup>
 
 </Project>

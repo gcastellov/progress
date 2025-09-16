@@ -1,11 +1,12 @@
 ﻿using Progress.Descriptors;
+using Progress.Reporters;
 using System.Text;
 
-namespace Progress.UnitTest;
+namespace Progress.UnitTest.Reporters;
 
-public class ReporterTests
+public class ConsoleReporterTests
 {
-    public ReporterTests()
+    public ConsoleReporterTests()
     {
         StringBuilder builder = new();
         TextWriter writer = new StringWriter(builder);
@@ -16,7 +17,7 @@ public class ReporterTests
     public void GivenDefaults_WhenInitializing_ThenExpectedSettings()
     {
         // Arrange
-        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
 
         // Assert
         reporter.Configuration.Options.DisplayStartingTime.Should().BeTrue();
@@ -39,7 +40,7 @@ public class ReporterTests
     public void GivenNothingToComplete_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var action = () => new Reporter(0, BarDescriptor.Default.Build());
+        var action = () => new ConsoleReporter(0, BarDescriptor.Default.Build());
 
         // Assert
         action.Should().Throw<ArgumentException>();
@@ -49,7 +50,7 @@ public class ReporterTests
     public void GivenNoComponent_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var action = () => new Reporter(100, null!);
+        var action = () => new ConsoleReporter(100, null!);
 
         // Assert
         action.Should().Throw<ArgumentNullException>();
@@ -59,7 +60,7 @@ public class ReporterTests
     public void GivenOperationNotStarted_WhenStopping_ThenThrowsException()
     {
         // Arrange
-        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
 
         // Act
         var action = () => reporter.Stop();
@@ -72,7 +73,7 @@ public class ReporterTests
     public void GivenOperationNotStarted_WhenResuming_ThenThrowsException()
     {
         // Arrange
-        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
 
         // Act
         var action = () => reporter.Resume();
@@ -85,7 +86,7 @@ public class ReporterTests
     public void GivenOperationNotStopped_WhenResuming_ThenThrowsException()
     {
         // Arrange
-        using var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        using var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
         reporter.Start();
 
         // Act
@@ -99,7 +100,7 @@ public class ReporterTests
     public void GivenStartedOperation_WhenStopping_ThenSuccess()
     {
         // Arrange
-        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
         reporter.Start();
 
         // Act
@@ -110,7 +111,7 @@ public class ReporterTests
     public void GivenStoppedOperation_WhenResuming_ThenSuccess()
     {
         // Arrange
-        var reporter = new Reporter(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
         reporter.Start();
         reporter.Stop();
 
@@ -123,7 +124,7 @@ public class ReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var reporter = new Reporter(100, BarDescriptor.Default.Build())
+        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build())
         {
             OnProgress = (stats) => isCalled = true
         };
@@ -145,7 +146,7 @@ public class ReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var reporter = new Reporter(1, BarDescriptor.Default.Build())
+        var reporter = new ConsoleReporter(1, BarDescriptor.Default.Build())
         {
             OnCompletion = (stats) => isCalled = true
         };
