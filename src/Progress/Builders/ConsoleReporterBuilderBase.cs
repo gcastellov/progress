@@ -1,5 +1,6 @@
 ﻿using Progress.Reporters;
 using Progress.Settings;
+using Progress.Settings.Console;
 
 namespace Progress.Builders;
 
@@ -205,4 +206,28 @@ public abstract class ConsoleReporterBuilderBase<T, U>
     /// </summary>
     /// <returns></returns>
     public abstract T Build();
+
+
+    internal void SetCallbacks(ConsoleReporterBase reporter)
+    {
+        reporter.OnProgress = _onProgressNotified;
+        reporter.OnCompletion = _onCompletionNotified;
+    }
+
+    internal void SetConfiguration(ConsoleReporterBase reporter)
+    {
+        reporter.Configuration.ReportFrequency = _reportFrequency;
+        reporter.Configuration.StatsFrequency = _statsFrequency;
+        reporter.Configuration.ExportSettings = _exportSettings;
+        reporter.Configuration.Options.DisplayRemainingTime = _displayRemainingTime;
+        reporter.Configuration.Options.DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival;
+        reporter.Configuration.Options.DisplayElapsedTime = _displayElapsedTime;
+        reporter.Configuration.Options.DisplayStartingTime = _displayStartingTime;
+        reporter.Configuration.Options.DisplayItemsOverview = _displayItemsOverview;
+        reporter.Configuration.Options.DisplayItemsSummary = _displayItemsSummary;
+        reporter.Configuration.Options.HideWorkflowOnComplete = _hideOnComplete;
+        reporter.Configuration.Options.NotifyProgressStats = _onProgressNotified != null;
+        reporter.Configuration.Options.NotifyCompletionStats = _onCompletionNotified != null;
+        reporter.Configuration.Options.ExportCompletionStats = _exportSettings != null;
+    }
 }

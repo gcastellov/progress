@@ -28,6 +28,7 @@ public class ConsoleReporterTests
         reporter.Configuration.Options.DisplayEstimatedTimeOfArrival.Should().BeTrue();
         reporter.Configuration.Options.DisplayItemsOverview.Should().BeTrue();
         reporter.Configuration.Options.DisplayItemsSummary.Should().BeTrue();
+        reporter.Configuration.Options.HideWorkflowOnComplete.Should().BeFalse();
         reporter.Configuration.Options.NotifyProgressStats.Should().BeFalse();
         reporter.Configuration.Options.NotifyCompletionStats.Should().BeFalse();
         reporter.Configuration.Options.ExportCompletionStats.Should().BeFalse();

@@ -45,29 +45,17 @@ public class ConsoleReporterBuilder : ConsoleReporterBuilderBase<ConsoleReporter
         if (_expectedItemsCount == 0)
             throw new ArgumentException("Nothing to do! Set the expected items count for completion.");
 
+        if (_componentDescriptor == null)
+            throw new ArgumentException("Add a component descriptor to display progress");
+
         var component = _componentDescriptor.Build();
 
         var workload = Workload.Default(_expectedItemsCount);
         workload.Component = component;
 
-        var reporter = new ConsoleReporter(workload)
-        {
-            OnProgress = _onProgressNotified,
-            OnCompletion = _onCompletionNotified
-        };
-
-        reporter.Configuration.ReportFrequency = _reportFrequency;
-        reporter.Configuration.StatsFrequency = _statsFrequency;
-        reporter.Configuration.ExportSettings = _exportSettings;
-        reporter.Configuration.Options.DisplayRemainingTime = _displayRemainingTime;
-        reporter.Configuration.Options.DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival;
-        reporter.Configuration.Options.DisplayElapsedTime = _displayElapsedTime;
-        reporter.Configuration.Options.DisplayStartingTime = _displayStartingTime;
-        reporter.Configuration.Options.DisplayItemsOverview = _displayItemsOverview;
-        reporter.Configuration.Options.DisplayItemsSummary = _displayItemsSummary;
-        reporter.Configuration.Options.NotifyProgressStats = _onProgressNotified != null;
-        reporter.Configuration.Options.NotifyCompletionStats = _onCompletionNotified != null;
-        reporter.Configuration.Options.ExportCompletionStats = _exportSettings != null;
+        ConsoleReporter reporter = new(workload);
+        SetCallbacks(reporter);
+        SetConfiguration(reporter);
 
         return reporter;
     }

@@ -38,25 +38,12 @@ public class ConsoleAggregateReporterBuilder : ConsoleReporterBuilderBase<Consol
     /// <exception cref="ArgumentException"></exception>
     public override ConsoleAggregateReporter Build()
     {
-        var reporter = new ConsoleAggregateReporter(_workloads.Values)
-        {
-            OnProgress = _onProgressNotified,
-            OnCompletion = _onCompletionNotified
-        };
+        if (!_workloads.Any())
+            throw new ArgumentException("Add some workloads to display progress");
 
-        reporter.Configuration.ReportFrequency = _reportFrequency;
-        reporter.Configuration.StatsFrequency = _statsFrequency;
-        reporter.Configuration.ExportSettings = _exportSettings;
-        reporter.Configuration.Options.DisplayRemainingTime = _displayRemainingTime;
-        reporter.Configuration.Options.DisplayEstimatedTimeOfArrival = _displayEstTimeOfArrival;
-        reporter.Configuration.Options.DisplayElapsedTime = _displayElapsedTime;
-        reporter.Configuration.Options.DisplayStartingTime = _displayStartingTime;
-        reporter.Configuration.Options.DisplayItemsOverview = _displayItemsOverview;
-        reporter.Configuration.Options.DisplayItemsSummary = _displayItemsSummary;
-        reporter.Configuration.Options.HideWorkflowOnComplete = _hideOnComplete;
-        reporter.Configuration.Options.NotifyProgressStats = _onProgressNotified != null;
-        reporter.Configuration.Options.NotifyCompletionStats = _onCompletionNotified != null;
-        reporter.Configuration.Options.ExportCompletionStats = _exportSettings != null;
+        ConsoleAggregateReporter reporter = new(_workloads.Values);
+        SetCallbacks(reporter);
+        SetConfiguration(reporter);
 
         return reporter;
     }

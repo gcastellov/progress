@@ -2,7 +2,6 @@
 using Progress.Descriptors;
 using Progress.Reporters;
 using Progress.Settings;
-using static Progress.Samples.InstallerWorker;
 
 namespace Progress.Samples.Bar.App;
 

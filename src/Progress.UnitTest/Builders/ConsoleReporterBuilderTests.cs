@@ -184,4 +184,19 @@ public class ConsoleReporterBuilderTests
         actual.Configuration.ExportSettings.FileType.Should().Be(FileType.Text);
         actual.Configuration.Options.ExportCompletionStats.Should().BeTrue();
     }
+
+    [Fact]
+    public void GivenHideOnComplete_WhenBuilding_ThenReporterIsSetUp()
+    {
+        // Arrange
+        var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
+            .HideWorkloadOnComplete(true);
+
+        // Act
+        var actual = builder.Build().Configuration.Options;
+
+        // Assert
+        actual.HideWorkflowOnComplete.Should().BeTrue();
+    }
 }
