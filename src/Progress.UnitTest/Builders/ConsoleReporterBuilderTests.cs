@@ -9,10 +9,11 @@ public class ConsoleReporterBuilderTests
     public void GivenNothingToComplete_WhenBuilding_ThenThrowsException()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder();
+        var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(0);
 
         // Act
-        var action = () => builder.Build(0);
+        var action = () => builder.Build();
 
         // Assert
         action.Should().Throw<ArgumentException>();
@@ -22,10 +23,11 @@ public class ConsoleReporterBuilderTests
     public void GivenSomethingToComplete_WhenBuilding_ThenReturnsReporter()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder();
+        var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100);
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build();
 
         // Assert
         actual.Should().NotBeNull();
@@ -37,10 +39,11 @@ public class ConsoleReporterBuilderTests
         // Arrange
         var expectedFrequency = TimeSpan.FromSeconds(20);
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .UsingReportingFrequency(expectedFrequency);
 
         // Act
-        var actual = builder.Build(100).Configuration;
+        var actual = builder.Build().Configuration;
 
         // Assert
         actual.ReportFrequency.Should().Be(expectedFrequency);
@@ -51,10 +54,11 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .DisplayingElapsedTime();
 
         // Act
-        var actual = builder.Build(100).Configuration.Options;
+        var actual = builder.Build().Configuration.Options;
 
         // Assert
         actual.DisplayElapsedTime.Should().BeTrue();
@@ -65,10 +69,11 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .DisplayingStartingTime();
 
         // Act
-        var actual = builder.Build(100).Configuration.Options;
+        var actual = builder.Build().Configuration.Options;
 
         // Assert
         actual.DisplayStartingTime.Should().BeTrue();
@@ -79,10 +84,11 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .DisplayingItemsOverview();
 
         // Act
-        var actual = builder.Build(100).Configuration.Options;
+        var actual = builder.Build().Configuration.Options;
 
         // Assert
         actual.DisplayItemsOverview.Should().BeTrue();
@@ -93,10 +99,11 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .DisplayingItemsSummary();
 
         // Act
-        var actual = builder.Build(100).Configuration.Options;
+        var actual = builder.Build().Configuration.Options;
 
         // Assert
         actual.DisplayItemsSummary.Should().BeTrue();
@@ -108,10 +115,11 @@ public class ConsoleReporterBuilderTests
         // Arrange
         var callback = (Stats stats) => { };
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .NotifyingProgress(callback);
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build();
 
         // Arrange
         actual.OnProgress.Should().NotBeNull();
@@ -126,10 +134,11 @@ public class ConsoleReporterBuilderTests
         var callback = (Stats stats) => { };
         var frequency = TimeSpan.FromSeconds(20);
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .NotifyingProgress(callback, frequency);
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build();
 
         // Arrange
         actual.OnProgress.Should().NotBeNull();
@@ -144,10 +153,11 @@ public class ConsoleReporterBuilderTests
         // Arrange
         var callback = (Stats stats) => { };
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .NotifyingCompletion(callback);
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build();
 
         // Arrange
         actual.OnCompletion.Should().NotBeNull();
@@ -162,10 +172,11 @@ public class ConsoleReporterBuilderTests
         const string fileName = "output.txt";
         const FileType type = FileType.Text;
         var builder = new ConsoleReporterBuilder()
+            .UsingExpectedItems(100)
             .ExportingTo(fileName, type);
 
         // Act
-        var actual = builder.Build(100);
+        var actual = builder.Build();
 
         // Assert
         actual.Configuration.ExportSettings.Should().NotBeNull();

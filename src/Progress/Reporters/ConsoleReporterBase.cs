@@ -159,6 +159,9 @@ public abstract class ConsoleReporterBase : IDisposable
 
                 if (_reportingThread != null && _reportingThread.IsAlive)
                     _reportingThread.Join();
+
+                OnProgress = null!;
+                OnCompletion = null!;
             }
         }
     }

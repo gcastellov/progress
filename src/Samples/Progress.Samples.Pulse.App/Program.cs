@@ -27,7 +27,8 @@ using var reporter = new ConsoleReporterBuilder()
     .ExportingTo("output.txt", FileType.Text)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(PulseDescriptor.Default)
-    .Build(SimpleWorker.ExpectedItems);
+    .UsingExpectedItems(SimpleWorker.ExpectedItems)
+    .Build();
 
 var worker = new SimpleWorker()
 {

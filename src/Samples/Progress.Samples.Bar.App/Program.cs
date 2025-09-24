@@ -18,18 +18,16 @@ var executeSimpleSample = async () =>
 
 var executeInstallerSample = async () =>
 {
-    using var reporter = ReporterFactory.GetConsoleAggregateReporterBuilder();
-
-    var worker = new InstallerWorker()
-    {
-        OnSuccess = (name) => reporter.ReportSuccess(name),
-        OnFailure = (name) => reporter.ReportFailure(name),
-    };
+    var worker = new InstallerWorker();
+    using var reporter = ReporterFactory.GetConsoleAggregateReporterBuilder(worker);
+    worker.OnSuccess = (name) => reporter.ReportSuccess(name);
+    worker.OnFailure = (name) => reporter.ReportFailure(name);
 
     reporter.Start();
-    await worker.CalcAsync();
-    Task[] restTasks = [worker.DownloadAsync(), worker.InstallAsync()];
+    await worker.CalcRequirements.CalcAsync();
+    Task[] restTasks = [worker.DownloadArtifacts.DownloadAsync(), worker.InstallArtifacts.InstallAsync()];
     await Task.WhenAll(restTasks);
 };
 
-await executeInstallerSample();
+//await executeInstallerSample();
+await executeSimpleSample();

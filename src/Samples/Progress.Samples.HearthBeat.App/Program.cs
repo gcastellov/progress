@@ -22,11 +22,12 @@ using var reporter = new ConsoleReporterBuilder()
     .DisplayingItemsSummary()
     .DisplayingItemsOverview()
     .NotifyingProgress(onProgress)
-    .NotifyingCompletion(onCompletion)
+    .NotifyingCompletion(onCompletion)    
     .ExportingTo("output.csv", FileType.Csv)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(HearthBeatDescriptor.Default)
-    .Build(SimpleWorker.ExpectedItems);
+    .UsingExpectedItems(SimpleWorker.ExpectedItems)
+    .Build();
 
 var worker = new SimpleWorker()
 {

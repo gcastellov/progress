@@ -23,4 +23,9 @@ public enum FileType
     Xml
 }
 
-internal record ExportSettings(string FileName, FileType FileType);
+/// <summary>
+/// Define the export settings
+/// </summary>
+/// <param name="FileName"></param>
+/// <param name="FileType"></param>
+public record ExportSettings(string FileName, FileType FileType);

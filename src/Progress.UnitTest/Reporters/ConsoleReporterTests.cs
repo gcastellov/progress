@@ -17,7 +17,8 @@ public class ConsoleReporterTests
     public void GivenDefaults_WhenInitializing_ThenExpectedSettings()
     {
         // Arrange
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload);
 
         // Assert
@@ -41,7 +42,8 @@ public class ConsoleReporterTests
     public void GivenNothingToComplete_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var workload = Workload.Default(0, BarDescriptor.Default.Build());
+        var workload = Workload.Default(0);
+        workload.Component = BarDescriptor.Default.Build();
         var action = () => new ConsoleReporter(workload);
 
         // Assert
@@ -52,7 +54,8 @@ public class ConsoleReporterTests
     public void GivenNoComponent_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var workload = Workload.Default(100, null!);
+        var workload = Workload.Default(100);
+        workload.Component = null!;
         var action = () => new ConsoleReporter(workload);
 
         // Assert
@@ -63,7 +66,8 @@ public class ConsoleReporterTests
     public void GivenOperationNotStarted_WhenStopping_ThenThrowsException()
     {
         // Arrange
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload);
 
         // Act
@@ -77,7 +81,8 @@ public class ConsoleReporterTests
     public void GivenOperationNotStarted_WhenResuming_ThenThrowsException()
     {
         // Arrange
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload);
 
         // Act
@@ -91,7 +96,8 @@ public class ConsoleReporterTests
     public void GivenOperationNotStopped_WhenResuming_ThenThrowsException()
     {
         // Arrange
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         using var reporter = new ConsoleReporter(workload);
         reporter.Start();
 
@@ -106,7 +112,8 @@ public class ConsoleReporterTests
     public void GivenStartedOperation_WhenStopping_ThenSuccess()
     {
         // Arrange
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload);
         reporter.Start();
 
@@ -118,7 +125,8 @@ public class ConsoleReporterTests
     public void GivenStoppedOperation_WhenResuming_ThenSuccess()
     {
         // Arrange
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload);
         reporter.Start();
         reporter.Stop();
@@ -132,7 +140,8 @@ public class ConsoleReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload)
         {
             OnProgress = (stats) => isCalled = true
@@ -155,7 +164,8 @@ public class ConsoleReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var workload = Workload.Default(1, BarDescriptor.Default.Build());
+        var workload = Workload.Default(1);
+        workload.Component = BarDescriptor.Default.Build();
         var reporter = new ConsoleReporter(workload)
         {
             OnCompletion = (stats) => isCalled = true

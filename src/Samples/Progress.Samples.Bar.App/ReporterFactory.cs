@@ -32,11 +32,11 @@ internal static class ReporterFactory
             .ExportingTo("output.json", FileType.Json)
             .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
             .UsingComponentDescriptor(BarDescriptor.Default)
-            .Build(SimpleWorker.ExpectedItems);
+            .UsingExpectedItems(SimpleWorker.ExpectedItems)
+            .Build();
     }
 
-
-    public static ConsoleAggregateReporter GetConsoleAggregateReporterBuilder()
+    public static ConsoleAggregateReporter GetConsoleAggregateReporterBuilder(InstallerWorker worker)
     {
         return new ConsoleAggregateReporterBuilder()
             .DisplayingStartingTime()
@@ -47,9 +47,9 @@ internal static class ReporterFactory
             .NotifyingCompletion(OnCompletion)
             .ExportingTo("output.json", FileType.Json)
             .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-            .UsingWorkload(CalcRequirements.Name, CalcRequirements.Description, CalcRequirements.ExpectedItems, BarDescriptor.Default)
-            .UsingWorkload(DonwloadArtifacts.Name, DonwloadArtifacts.Description, DonwloadArtifacts.ExpectedItems, BarDescriptor.Default)
-            .UsingWorkload(InstallArtifacts.Name, InstallArtifacts.Description, InstallArtifacts.ExpectedItems, BarDescriptor.Default)
+            .UsingWorkload(worker.CalcRequirements, BarDescriptor.Default)
+            .UsingWorkload(worker.DownloadArtifacts, BarDescriptor.Default)
+            .UsingWorkload(worker.InstallArtifacts, BarDescriptor.Default)
             .Build();
     }
 }

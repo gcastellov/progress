@@ -3,27 +3,50 @@ using System.Collections;
 
 namespace Progress.Reporters
 {
-    internal class Workload(string name, string description, ulong itemsCount, Component component)
+    /// <summary>
+    /// Initializes a new instance of <see cref="Workload"/> describing the task to perform.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="description"></param>
+    /// <param name="expectedItems"></param>
+    public class Workload(string id, string description, ulong expectedItems)
     {
-        public static Workload Default(ulong itemsCount, Component component) => new("Default", string.Empty, itemsCount, component);
+        /// <summary>
+        /// Helper to initialize a new instance of <see cref="Workload"/> with its identifier as 'Default'
+        /// </summary>
+        /// <param name="itemsCount"></param>
+        /// <returns></returns>
+        public static Workload Default(ulong itemsCount) => new("Default", string.Empty, itemsCount);
 
         private ulong _successCount;
         private ulong _failureCount;
 
-        public string Name { get; } = name;
+        /// <summary>
+        /// Gets the workload's identifier
+        /// </summary>
+        public string Id { get; } = id;
+        
+        /// <summary>
+        /// Gets the workflow description 
+        /// </summary>
         public string Description { get; } = description;
-        public ulong ItemsCount { get; } = itemsCount;
-        public Component Component { get; } = component;
-        public ulong SuccessCount => _successCount;
-        public ulong FailureCount => _failureCount;
-        public ulong CurrentCount => SuccessCount + FailureCount;
-        public bool IsFinished => CurrentCount == ItemsCount;
+        
+        /// <summary>
+        /// Gets the exepected items count
+        /// </summary>
+        public ulong ItemsCount { get; } = expectedItems;
 
-        public void ReportSuccess() => Interlocked.Increment(ref _successCount);
-        public void ReportFailure() => Interlocked.Increment(ref _failureCount);
-        public void Next() => Component.Next(ItemsCount, CurrentCount);
+        internal Component Component { get; set; } = default!;
+        internal ulong SuccessCount => _successCount;
+        internal ulong FailureCount => _failureCount;
+        internal ulong CurrentCount => SuccessCount + FailureCount;
+        internal bool IsFinished => CurrentCount == ItemsCount;
 
-        public void Reset()
+        internal void ReportSuccess() => Interlocked.Increment(ref _successCount);
+        internal void ReportFailure() => Interlocked.Increment(ref _failureCount);
+        internal void Next() => Component.Next(ItemsCount, CurrentCount);
+
+        internal void Reset()
         {
             _successCount = 0;
             _failureCount = 0;
@@ -32,7 +55,7 @@ namespace Progress.Reporters
 
     internal class Workloads(ICollection<Workload> workloads) : IEnumerable<Workload>
     {
-        private readonly Dictionary<string, Workload> _workloads = workloads.ToDictionary(w => w.Name, w => w);
+        private readonly Dictionary<string, Workload> _workloads = workloads.ToDictionary(w => w.Id, w => w);
 
         public IEnumerator<Workload> GetEnumerator() => _workloads.Values.GetEnumerator();
         public double CurrentPercent => _workloads.Values.Select(w => w.Component.CurrentPercent.Value).Sum() / _workloads.Count();

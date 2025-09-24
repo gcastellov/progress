@@ -27,7 +27,8 @@ using var reporter = new ConsoleReporterBuilder()
     .ExportingTo("output.xml", FileType.Xml)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(SpinnerDescriptor.Default)
-    .Build(SimpleWorker.ExpectedItems);
+    .UsingExpectedItems(SimpleWorker.ExpectedItems)
+    .Build();
 
 var worker = new SimpleWorker()
 {
