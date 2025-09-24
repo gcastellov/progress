@@ -1,38 +1,35 @@
-﻿using Progress;
-using Progress.Builders;
-using Progress.Descriptors;
-using Progress.Samples;
-using Progress.Settings;
+﻿using Progress.Samples;
+using Progress.Samples.Bar.App;
 
-var onProgress = (Stats stats) =>
+
+var executeSimpleSample = async () =>
 {
-    // TODO: Do something useful
+    using var reporter = ReporterFactory.GetConsoleReporterBuilder();
+
+    var worker = new SimpleWorker()
+    {
+        OnSuccess = () => reporter.ReportSuccess(),
+        OnFailure = () => reporter.ReportFailure(),
+    };
+
+    reporter.Start();
+    await worker.DoMyworkAsync();
 };
 
-var onCompletion = (Stats stats) =>
+var executeInstallerSample = async () =>
 {
-    // TODO: Do something useful
+    using var reporter = ReporterFactory.GetConsoleAggregateReporterBuilder();
+
+    var worker = new InstallerWorker()
+    {
+        OnSuccess = (name) => reporter.ReportSuccess(name),
+        OnFailure = (name) => reporter.ReportFailure(name),
+    };
+
+    reporter.Start();
+    await worker.CalcAsync();
+    Task[] restTasks = [worker.DownloadAsync(), worker.InstallAsync()];
+    await Task.WhenAll(restTasks);
 };
 
-using var reporter = new ConsoleReporterBuilder()
-    .DisplayingStartingTime()
-    .DisplayingElapsedTime()
-    .DisplayingTimeOfArrival()
-    .DisplayingRemainingTime()
-    .DisplayingItemsSummary()
-    .DisplayingItemsOverview()
-    .NotifyingProgress(onProgress)
-    .NotifyingCompletion(onCompletion)
-    .ExportingTo("output.json", FileType.Json)
-    .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-    .UsingComponentDescriptor(BarDescriptor.Default)
-    .Build(Worker.AllItems);
-
-var worker = new Worker()
-{
-    OnSuccess = () => reporter.ReportSuccess(),
-    OnFailure = () => reporter.ReportFailure(),
-};
-
-reporter.Start();
-await worker.DoMywork();
+await executeInstallerSample();

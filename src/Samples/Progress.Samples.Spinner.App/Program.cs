@@ -27,13 +27,13 @@ using var reporter = new ConsoleReporterBuilder()
     .ExportingTo("output.xml", FileType.Xml)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(SpinnerDescriptor.Default)
-    .Build(Worker.AllItems);
+    .Build(SimpleWorker.ExpectedItems);
 
-var worker = new Worker()
+var worker = new SimpleWorker()
 {
     OnSuccess = () => reporter.ReportSuccess(),
     OnFailure = () => reporter.ReportFailure(),
 };
 
 reporter.Start();
-await worker.DoMywork();
+await worker.DoMyworkAsync();

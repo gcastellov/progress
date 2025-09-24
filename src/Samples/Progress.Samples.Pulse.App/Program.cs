@@ -27,13 +27,13 @@ using var reporter = new ConsoleReporterBuilder()
     .ExportingTo("output.txt", FileType.Text)
     .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
     .UsingComponentDescriptor(PulseDescriptor.Default)
-    .Build(Worker.AllItems);
+    .Build(SimpleWorker.ExpectedItems);
 
-var worker = new Worker()
+var worker = new SimpleWorker()
 {
     OnSuccess = () => reporter.ReportSuccess(),
     OnFailure = () => reporter.ReportFailure(),
 };
 
 reporter.Start();
-await worker.DoMywork();
+await worker.DoMyworkAsync();

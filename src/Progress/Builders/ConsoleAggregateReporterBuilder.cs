@@ -5,10 +5,10 @@ using Progress.Settings;
 namespace Progress.Builders;
 
 /// <summary>
-/// Builder for helping to set up the console reporter with the desired behavior.
-/// It will create an instance of <see cref="ConsoleReporter"/> using a <see cref="BarDescriptor"/> by default.
+/// Builder for helping to set up the console aggregate reporter with the desired behavior.
+/// It will create an instance of <see cref="ConsoleAggregateReporter"/> using a <see cref="BarDescriptor"/> by default.
 /// </summary>
-public class ConsoleReporterBuilder
+public class ConsoleAggregateReporterBuilder
 {
     private bool _displayRemainingTime;
     private bool _displayEstTimeOfArrival;
@@ -16,9 +16,10 @@ public class ConsoleReporterBuilder
     private bool _displayStartingTime;
     private bool _displayItemsOverview;
     private bool _displayItemsSummary;
+    private bool _hideOnComplete;
     private TimeSpan _reportFrequency = TimeSpan.FromSeconds(1);
     private TimeSpan _statsFrequency = TimeSpan.FromSeconds(5);
-    private ComponentDescriptor _componentDescriptor = BarDescriptor.Default;
+    private Dictionary<string, Workload> _workloads = new();
     private ExportSettings _exportSettings = default!;
     private Action<Stats> _onProgressNotified = default!;
     private Action<Stats> _onCompletionNotified = default!;
@@ -27,7 +28,7 @@ public class ConsoleReporterBuilder
     /// The reporter will display the elapsed time since the start.
     /// </summary>
     /// <returns></returns>
-    public ConsoleReporterBuilder DisplayingElapsedTime()
+    public ConsoleAggregateReporterBuilder DisplayingElapsedTime()
     {
         _displayElapsedTime = true;
         return this;
@@ -37,7 +38,7 @@ public class ConsoleReporterBuilder
     /// The reporter will display the remaining time to finish.
     /// </summary>
     /// <returns></returns>
-    public ConsoleReporterBuilder DisplayingRemainingTime()
+    public ConsoleAggregateReporterBuilder DisplayingRemainingTime()
     {
         _displayRemainingTime = true;
         return this;
@@ -47,7 +48,7 @@ public class ConsoleReporterBuilder
     /// The reporter will display when the operation is expected to finish.
     /// </summary>
     /// <returns></returns>
-    public ConsoleReporterBuilder DisplayingTimeOfArrival()
+    public ConsoleAggregateReporterBuilder DisplayingTimeOfArrival()
     {
         _displayEstTimeOfArrival = true;
         return this;
@@ -57,7 +58,7 @@ public class ConsoleReporterBuilder
     /// The reporter will display when the operation started.
     /// </summary>
     /// <returns></returns>
-    public ConsoleReporterBuilder DisplayingStartingTime()
+    public ConsoleAggregateReporterBuilder DisplayingStartingTime()
     {
         _displayStartingTime = true;
         return this;
@@ -67,7 +68,7 @@ public class ConsoleReporterBuilder
     /// The rerporter will display the total of items processed.
     /// </summary>
     /// <returns></returns>
-    public ConsoleReporterBuilder DisplayingItemsOverview()
+    public ConsoleAggregateReporterBuilder DisplayingItemsOverview()
     {
         _displayItemsOverview = true;
         return this;
@@ -77,9 +78,20 @@ public class ConsoleReporterBuilder
     /// The reporter will display the amount of success and failures.
     /// </summary>
     /// <returns></returns>
-    public ConsoleReporterBuilder DisplayingItemsSummary()
+    public ConsoleAggregateReporterBuilder DisplayingItemsSummary()
     {
         _displayItemsSummary = true;
+        return this;
+    }
+
+    /// <summary>
+    /// The reporter will hide the workload progression when it gets the 100%.
+    /// </summary>
+    /// <param name="hide"></param>
+    /// <returns></returns>
+    public ConsoleAggregateReporterBuilder HideWorkloadOnComplete(bool hide)
+    {
+        _hideOnComplete = hide;
         return this;
     }
 
@@ -89,20 +101,29 @@ public class ConsoleReporterBuilder
     /// </summary>
     /// <param name="frequency"></param>
     /// <returns></returns>
-    public ConsoleReporterBuilder UsingReportingFrequency(TimeSpan frequency)
+    public ConsoleAggregateReporterBuilder UsingReportingFrequency(TimeSpan frequency)
     {
         _reportFrequency = frequency;
         return this;
     }
 
     /// <summary>
-    /// Sets the <see cref="ComponentDescriptor"/> being used to render the progress of the operation.
+    /// Sets the workload with its name, description, expected items and the <see cref="ComponentDescriptor"/> being used to render the progress of the operation.
     /// </summary>
+    /// <param name="name"></param>
+    /// <param name="description"></param>
+    /// <param name="expectedItems"></param>
     /// <param name="descriptor"></param>
     /// <returns></returns>
-    public ConsoleReporterBuilder UsingComponentDescriptor(ComponentDescriptor descriptor)
+    public ConsoleAggregateReporterBuilder UsingWorkload(string name, string description, ulong expectedItems, ComponentDescriptor descriptor)
     {
-        _componentDescriptor = descriptor;
+        if (expectedItems == 0)
+            throw new ArgumentException("Nothing to do! Set the expected items count for completion.");
+
+        if (_workloads.ContainsKey(name))
+            throw new InvalidOperationException($"A workload with name {name} is already set up. Please, use a different one.");
+
+        _workloads.Add(name, new Workload(name, description, expectedItems, descriptor.Build()));
         return this;
     }
 
@@ -112,7 +133,7 @@ public class ConsoleReporterBuilder
     /// </summary>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public ConsoleReporterBuilder NotifyingProgress(Action<Stats> callback)
+    public ConsoleAggregateReporterBuilder NotifyingProgress(Action<Stats> callback)
     {
         return NotifyingProgress(callback, _statsFrequency);
     }
@@ -123,7 +144,7 @@ public class ConsoleReporterBuilder
     /// <param name="callback"></param>
     /// <param name="statsFrequency"></param>
     /// <returns></returns>
-    public ConsoleReporterBuilder NotifyingProgress(Action<Stats> callback, TimeSpan statsFrequency)
+    public ConsoleAggregateReporterBuilder NotifyingProgress(Action<Stats> callback, TimeSpan statsFrequency)
     {
         _onProgressNotified = callback;
         _statsFrequency = statsFrequency;
@@ -135,7 +156,7 @@ public class ConsoleReporterBuilder
     /// </summary>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public ConsoleReporterBuilder NotifyingCompletion(Action<Stats> callback)
+    public ConsoleAggregateReporterBuilder NotifyingCompletion(Action<Stats> callback)
     {
         _onCompletionNotified = callback;
         return this;
@@ -147,26 +168,21 @@ public class ConsoleReporterBuilder
     /// <param name="fileName"></param>
     /// <param name="fileType"></param>
     /// <returns></returns>
-    public ConsoleReporterBuilder ExportingTo(string fileName, FileType fileType)
+    public ConsoleAggregateReporterBuilder ExportingTo(string fileName, FileType fileType)
     {
         _exportSettings = new ExportSettings(fileName, fileType);
         return this;
     }
 
+
     /// <summary>
-    /// Builds the reporter getting an instance of <see cref="ConsoleReporter"/>.
+    /// Builds the reporter getting an instance of <see cref="ConsoleAggregateReporter"/>.
     /// </summary>
-    /// <param name="expectedItems"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public ConsoleReporter Build(ulong expectedItems)
+    public ConsoleAggregateReporter Build()
     {
-        if (expectedItems == 0)
-            throw new ArgumentException("Nothing to do! Set the expected items count for completion.");
-
-        var component = _componentDescriptor.Build();
-
-        var reporter = new ConsoleReporter(Workload.Default(expectedItems, component))
+        var reporter = new ConsoleAggregateReporter(_workloads.Values)
         {
             OnProgress = _onProgressNotified,
             OnCompletion = _onCompletionNotified
@@ -181,6 +197,7 @@ public class ConsoleReporterBuilder
         reporter.Configuration.Options.DisplayStartingTime = _displayStartingTime;
         reporter.Configuration.Options.DisplayItemsOverview = _displayItemsOverview;
         reporter.Configuration.Options.DisplayItemsSummary = _displayItemsSummary;
+        reporter.Configuration.Options.HideWorkflowOnComplete = _hideOnComplete;
         reporter.Configuration.Options.NotifyProgressStats = _onProgressNotified != null;
         reporter.Configuration.Options.NotifyCompletionStats = _onCompletionNotified != null;
         reporter.Configuration.Options.ExportCompletionStats = _exportSettings != null;

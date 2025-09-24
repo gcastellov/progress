@@ -1,4 +1,5 @@
 ﻿using Progress.Descriptors;
+using Progress.Reporters;
 
 namespace Progress.UnitTest;
 
@@ -8,7 +9,7 @@ public class PrinterTests
     public void GivenDefaults_WhenPrinting_ThenGetsOutput()
     {
         // Arrange
-        Printer printer = new(new Settings.Console.ReportingOptions(), BarDescriptor.Default.Build());
+        Printer printer = new(new Settings.Console.ReportingOptions(), [ Workload.Default(10, BarDescriptor.Default.Build()) ]);
         Stats stats = new();
 
         // Act

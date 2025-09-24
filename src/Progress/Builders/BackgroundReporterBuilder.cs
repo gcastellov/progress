@@ -63,15 +63,15 @@ public class BackgroundReporterBuilder
     /// <summary>
     /// Builds the reporter getting an instance of <see cref="BackgroundReporter"/>.
     /// </summary>
-    /// <param name="itemsCount"></param>
+    /// <param name="expectedItems"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public BackgroundReporter Build(ulong itemsCount)
+    public BackgroundReporter Build(ulong expectedItems)
     {
-        if (itemsCount == 0)
-            throw new ArgumentException("Nothing to do! Set the initial items count for completion.");
+        if (expectedItems == 0)
+            throw new ArgumentException("Nothing to do! Set the expected items count for completion.");
 
-        var reporter = new BackgroundReporter(itemsCount)
+        var reporter = new BackgroundReporter(expectedItems)
         {
             OnProgress = _onProgressNotified,
             OnCompletion = _onCompletionNotified

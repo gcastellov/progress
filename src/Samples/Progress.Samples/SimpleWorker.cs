@@ -1,17 +1,17 @@
 ﻿namespace Progress.Samples;
 
-public class Worker
+public class SimpleWorker
 {
-    public const long AllItems = 85161;
+    public const long ExpectedItems = 85161;
     private const long BatchSize = 500;
 
     public Action OnSuccess { get; set; } = default!;
     public Action OnFailure { get; set; } = default!;
 
-    public async Task DoMywork()
+    public async Task DoMyworkAsync()
     {
-        long rem = AllItems % BatchSize;
-        int batchCount = (int)(AllItems / BatchSize);
+        long rem = ExpectedItems % BatchSize;
+        int batchCount = (int)(ExpectedItems / BatchSize);
         if (rem > 0)
             batchCount++;
 
@@ -22,7 +22,7 @@ public class Worker
                 {
                     return i < batchCount - 1
                         ? new string[BatchSize]
-                        : new string[AllItems % BatchSize];
+                        : new string[ExpectedItems % BatchSize];
                 }
 
                 return new string[BatchSize];

@@ -5,7 +5,7 @@ namespace Progress.Samples.Background.Api;
 
 internal class HostedService : IHostedService
 {
-    private readonly Worker _worker = new();
+    private readonly SimpleWorker _worker = new();
     private readonly BackgroundReporter _reporter;
 
     public HostedService(ILogger<HostedService> logger)
@@ -19,7 +19,7 @@ internal class HostedService : IHostedService
             {
                 logger.LogDebug("Getting stats on completion");
             })
-            .Build(Worker.AllItems);
+            .Build(SimpleWorker.ExpectedItems);
 
         _worker.OnSuccess = () => _reporter.ReportSuccess();
         _worker.OnFailure = () => _reporter.ReportFailure();
@@ -28,7 +28,7 @@ internal class HostedService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {        
         _reporter.Start();
-        await _worker.DoMywork();
+        await _worker.DoMyworkAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

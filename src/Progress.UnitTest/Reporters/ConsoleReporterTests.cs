@@ -17,7 +17,8 @@ public class ConsoleReporterTests
     public void GivenDefaults_WhenInitializing_ThenExpectedSettings()
     {
         // Arrange
-        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload);
 
         // Assert
         reporter.Configuration.Options.DisplayStartingTime.Should().BeTrue();
@@ -40,7 +41,8 @@ public class ConsoleReporterTests
     public void GivenNothingToComplete_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var action = () => new ConsoleReporter(0, BarDescriptor.Default.Build());
+        var workload = Workload.Default(0, BarDescriptor.Default.Build());
+        var action = () => new ConsoleReporter(workload);
 
         // Assert
         action.Should().Throw<ArgumentException>();
@@ -50,7 +52,8 @@ public class ConsoleReporterTests
     public void GivenNoComponent_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var action = () => new ConsoleReporter(100, null!);
+        var workload = Workload.Default(100, null!);
+        var action = () => new ConsoleReporter(workload);
 
         // Assert
         action.Should().Throw<ArgumentNullException>();
@@ -60,7 +63,8 @@ public class ConsoleReporterTests
     public void GivenOperationNotStarted_WhenStopping_ThenThrowsException()
     {
         // Arrange
-        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload);
 
         // Act
         var action = () => reporter.Stop();
@@ -73,7 +77,8 @@ public class ConsoleReporterTests
     public void GivenOperationNotStarted_WhenResuming_ThenThrowsException()
     {
         // Arrange
-        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload);
 
         // Act
         var action = () => reporter.Resume();
@@ -86,7 +91,8 @@ public class ConsoleReporterTests
     public void GivenOperationNotStopped_WhenResuming_ThenThrowsException()
     {
         // Arrange
-        using var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        using var reporter = new ConsoleReporter(workload);
         reporter.Start();
 
         // Act
@@ -100,7 +106,8 @@ public class ConsoleReporterTests
     public void GivenStartedOperation_WhenStopping_ThenSuccess()
     {
         // Arrange
-        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload);
         reporter.Start();
 
         // Act
@@ -111,7 +118,8 @@ public class ConsoleReporterTests
     public void GivenStoppedOperation_WhenResuming_ThenSuccess()
     {
         // Arrange
-        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build());
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload);
         reporter.Start();
         reporter.Stop();
 
@@ -124,7 +132,8 @@ public class ConsoleReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var reporter = new ConsoleReporter(100, BarDescriptor.Default.Build())
+        var workload = Workload.Default(100, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload)
         {
             OnProgress = (stats) => isCalled = true
         };
@@ -146,7 +155,8 @@ public class ConsoleReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var reporter = new ConsoleReporter(1, BarDescriptor.Default.Build())
+        var workload = Workload.Default(1, BarDescriptor.Default.Build());
+        var reporter = new ConsoleReporter(workload)
         {
             OnCompletion = (stats) => isCalled = true
         };
