@@ -41,6 +41,12 @@ public abstract class ConsoleReporterBase : IDisposable
     /// <exception cref="ArgumentNullException"></exception>
     internal ConsoleReporterBase(ICollection<Workload> workloads)
     {
+        if (workloads == null)
+            throw new ArgumentNullException(nameof(workloads));
+
+        if (workloads.Count == 0)
+            throw new ArgumentException("Nothing to do!. Provide at least one workload");
+
         foreach (var workload in workloads)
         {
             if (workload.ItemsCount == 0)
