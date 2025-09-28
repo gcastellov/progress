@@ -65,6 +65,8 @@ class Program
             .DisplayingElapsedTime()
             .DisplayingTimeOfArrival()
             .DisplayingRemainingTime()
+            .DisplayingItemsSummary()
+            .DisplayingItemsOverview()
             .NotifyingProgress(OnProgress)
             .NotifyingCompletion(OnCompletion)
             .ExportingTo("output.json", FileType.Json)
