@@ -6,7 +6,7 @@
 This library provides a set of features that help you spin up reporting tasks, either in the form of console apps that show workloads progression or via background jobs providing access to stats during the lifespan of the workload.
 
 Please read the documentation for further info about how to interact with the library's API here:
-[Library API](./src/Progress/content/README.md)
+[Library API](./src/Progress/Content/README.md)
 
 ## Reporters
 The reporter is the key component that orchestrates, provides and display information about the workloads progression. The following reporters are currently supported:
