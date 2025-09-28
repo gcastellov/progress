@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Progress.Samples.Bar.App": {
+      "commandName": "Project",
+      "commandLineArgs": "--type aggregate"
+    }
+  }
+}

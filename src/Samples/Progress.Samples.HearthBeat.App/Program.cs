@@ -2,38 +2,84 @@
 using Progress.Builders;
 using Progress.Descriptors;
 using Progress.Samples;
+using Progress.Samples.Utils;
 using Progress.Settings;
 
-var onProgress = (Stats stats) =>
+
+class Program
 {
-    // TODO: Do something useful
-};
+    private static Action<Stats> OnProgress = (Stats stats) =>
+    {
+        // TODO: Do something useful
+    };
 
-var onCompletion = (Stats stats) =>
-{
-    // TODO: Do something useful
-};
+    private static Action<Stats> OnCompletion = (Stats stats) =>
+    {
+        // TODO: Do something useful
+    };
 
-using var reporter = new ConsoleReporterBuilder()
-    .DisplayingStartingTime()
-    .DisplayingElapsedTime()
-    .DisplayingTimeOfArrival()
-    .DisplayingRemainingTime()
-    .DisplayingItemsSummary()
-    .DisplayingItemsOverview()
-    .NotifyingProgress(onProgress)
-    .NotifyingCompletion(onCompletion)    
-    .ExportingTo("output.csv", FileType.Csv)
-    .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-    .UsingComponentDescriptor(HearthBeatDescriptor.Default)
-    .UsingExpectedItems(SimpleWorker.ExpectedItems)
-    .Build();
+    static async Task Main(string[] args)
+    {
+        var task = ConsoleUtils.UseAggregateReporter(args) switch
+        {
+            true => RunInstallerSample(),
+            false => RunSimpleSample(),
+        };
 
-var worker = new SimpleWorker()
-{
-    OnSuccess = () => reporter.ReportSuccess(),
-    OnFailure = () => reporter.ReportFailure(),
-};
+        await task;
+    }
 
-reporter.Start();
-await worker.DoMyworkAsync();
+    private async static Task RunSimpleSample()
+    {
+        using var reporter = new ConsoleReporterBuilder()
+            .DisplayingStartingTime()
+            .DisplayingElapsedTime()
+            .DisplayingTimeOfArrival()
+            .DisplayingRemainingTime()
+            .DisplayingItemsSummary()
+            .DisplayingItemsOverview()
+            .NotifyingProgress(OnProgress)
+            .NotifyingCompletion(OnCompletion)
+            .ExportingTo("output.json", FileType.Json)
+            .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
+            .UsingComponentDescriptor(HearthBeatDescriptor.Default)
+            .UsingExpectedItems(SimpleWorker.ExpectedItems)
+            .Build();
+
+        var worker = new SimpleWorker()
+        {
+            OnSuccess = reporter.ReportSuccess,
+            OnFailure = reporter.ReportFailure,
+        };
+
+        reporter.Start();
+        await worker.DoMyworkAsync();
+    }
+
+    private async static Task RunInstallerSample()
+    {
+        var worker = new InstallerWorker();
+
+        using var reporter = new ConsoleAggregateReporterBuilder()
+            .DisplayingStartingTime()
+            .DisplayingElapsedTime()
+            .DisplayingTimeOfArrival()
+            .DisplayingRemainingTime()
+            .NotifyingProgress(OnProgress)
+            .NotifyingCompletion(OnCompletion)
+            .ExportingTo("output.json", FileType.Json)
+            .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
+            .UsingWorkload(worker.CalcRequirements, HearthBeatDescriptor.Default)
+            .UsingWorkload(worker.DownloadArtifacts, HearthBeatDescriptor.Default)
+            .UsingWorkload(worker.InstallArtifacts, HearthBeatDescriptor.Default)
+            .Build();
+
+        worker.OnSuccess = reporter.ReportSuccess;
+        worker.OnFailure = reporter.ReportFailure;
+
+        reporter.Start();
+        await worker.CalcRequirements.CalcAsync();
+        Task[] restTasks = [worker.DownloadArtifacts.DownloadAsync(), worker.InstallArtifacts.InstallAsync()];
+        await Task.WhenAll(restTasks);
+    }
+}
