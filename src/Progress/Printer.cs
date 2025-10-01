@@ -1,16 +1,16 @@
-﻿using Progress.Components;
+﻿using Progress.Reporters;
 using Progress.Settings.Console;
 using System.Text;
 
 namespace Progress;
 
-internal class Printer(ReportingOptions options, Component component)
+internal class Printer(ReportingOptions options, ICollection<Workload> workloads)
 {
     private const int Left_Padding = 30;
     private const int Right_Padding = 20;
 
     private readonly ReportingOptions _options = options; 
-    private readonly Component _component = component;
+    private readonly IEnumerable<Workload> _workloads = workloads;
     
     public string Print(Stats stats)
     {
@@ -63,7 +63,17 @@ internal class Printer(ReportingOptions options, Component component)
         }
 
         sBuilder.AppendLine();
-        sBuilder.AppendLine(_component.ToString());
+
+        foreach(var workload in _workloads)
+        {
+            if (_options.HideWorkflowOnComplete && workload.IsFinished)
+                continue;
+
+            sBuilder.AppendLine(workload.Description);
+            sBuilder.AppendLine(workload.Component.ToString());
+            sBuilder.AppendLine();
+        }
+
         return sBuilder.ToString();
     }
 }

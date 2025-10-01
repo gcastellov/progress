@@ -1,16 +1,17 @@
 ﻿using Progress.Builders;
+using Progress.Descriptors;
+using Progress.Reporters;
 using Progress.Settings;
 
 namespace Progress.UnitTest.Builders;
 
-public class ConsoleReporterBuilderTests
+public class ConsoleAggregateReporterBuilderTests
 {
     [Fact]
     public void GivenNothingToComplete_WhenBuilding_ThenThrowsException()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(0);
+        var builder = new ConsoleAggregateReporterBuilder();
 
         // Act
         var action = () => builder.Build();
@@ -23,8 +24,8 @@ public class ConsoleReporterBuilderTests
     public void GivenSomethingToComplete_WhenBuilding_ThenReturnsReporter()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100);
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default);
 
         // Act
         var actual = builder.Build();
@@ -38,8 +39,8 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var expectedFrequency = TimeSpan.FromSeconds(20);
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .UsingReportingFrequency(expectedFrequency);
 
         // Act
@@ -53,8 +54,8 @@ public class ConsoleReporterBuilderTests
     public void GivenElapsedTime_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .DisplayingElapsedTime();
 
         // Act
@@ -68,8 +69,8 @@ public class ConsoleReporterBuilderTests
     public void GivenStartingTime_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .DisplayingStartingTime();
 
         // Act
@@ -83,8 +84,8 @@ public class ConsoleReporterBuilderTests
     public void GivenItemsOverview_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .DisplayingItemsOverview();
 
         // Act
@@ -98,8 +99,8 @@ public class ConsoleReporterBuilderTests
     public void GivenSummary_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .DisplayingItemsSummary();
 
         // Act
@@ -114,8 +115,8 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var callback = (Stats stats) => { };
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .NotifyingProgress(callback);
 
         // Act
@@ -133,8 +134,8 @@ public class ConsoleReporterBuilderTests
         // Arrange
         var callback = (Stats stats) => { };
         var frequency = TimeSpan.FromSeconds(20);
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .NotifyingProgress(callback, frequency);
 
         // Act
@@ -152,8 +153,8 @@ public class ConsoleReporterBuilderTests
     {
         // Arrange
         var callback = (Stats stats) => { };
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .NotifyingCompletion(callback);
 
         // Act
@@ -171,8 +172,8 @@ public class ConsoleReporterBuilderTests
         // Arrange
         const string fileName = "output.txt";
         const FileType type = FileType.Text;
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .ExportingTo(fileName, type);
 
         // Act
@@ -189,8 +190,8 @@ public class ConsoleReporterBuilderTests
     public void GivenHideOnComplete_WhenBuilding_ThenReporterIsSetUp()
     {
         // Arrange
-        var builder = new ConsoleReporterBuilder()
-            .UsingExpectedItems(100)
+        var builder = new ConsoleAggregateReporterBuilder()
+            .UsingWorkload(Workload.Default(100), BarDescriptor.Default)
             .HideWorkloadOnComplete(true);
 
         // Act

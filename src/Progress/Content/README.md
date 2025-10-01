@@ -1,121 +1,126 @@
+![Progress](logo512x512.png)
+
 # Progress
 
-This library helps you to spin up reporters for giving an overview of the progression of a given operation. These reporters can either be for console apps that output the information or background jobs hosted by APIs handling the progress via hooks. 
+This library provides a set of features that help you spin up reporting tasks, either in the form of console apps that show workloads progression or via background jobs providing access to stats during the lifespan of the workload.
 
+## Key components
+- Reporters are the core components that display information about the current workload status.
+    - **ConsoleReporter**: Used in console apps to report progression of a simple workload.
+    - **ConsoleAggregateReporter**: Used in console apps to report progression of many workloads.
+    - **BackgroundReporter**: Used in background services that don't require to ouput to std out.
 
-## Report progress for console apps
-Report progression with ease by using multilple components such as Bars, Spinners, Pulse and more.
+- Components are objects that report progress as figures, such as bars, spinners, pulse ... Only supported for console-based reporters. All these components are internal and they can only be initialized via their Descriptors.
+    - Bar
+    - Spinner
+    - HearthBeat
+    - Pulse
+
+- Descriptors are builders that help to set up components with proper appearance and behavior.
+    - BarDescriptor
+    - SpinnerDescriptor
+    - HearthBeatDescriptor
+    - PulseDescriptor
+
+- ReporterBuilders help to set up reporters with workloads, components and behavior.
+    - ConsoleReporterBuilder
+    - ConsoleAggregateReporterBuilder
+    - BackgroundReporterBuilder
+
+## Console apps with ConsoleReporter
 
 ```csharp
-using var reporter = new ConsoleReporterBuilder()
-    .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-    .UsingComponentDescriptor(BarDescriptor.Default)
-    .Build(Worker.AllItems);
+        using var reporter = new ConsoleReporterBuilder()
+            .DisplayingStartingTime()
+            .DisplayingElapsedTime()
+            .DisplayingTimeOfArrival()
+            .DisplayingRemainingTime()
+            .DisplayingItemsSummary()
+            .DisplayingItemsOverview()
+            .NotifyingProgress(OnProgress)
+            .NotifyingCompletion(OnCompletion)
+            .ExportingTo("output.json", FileType.Json)
+            .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
+            .UsingComponentDescriptor(BarDescriptor.Default)
+            .UsingExpectedItems(SimpleWorker.ExpectedItems)
+            .Build();
 
-var worker = new Worker()
+        var worker = new SimpleWorker()
+        {
+            OnSuccess = reporter.ReportSuccess,
+            OnFailure = reporter.ReportFailure,
+        };
+
+        reporter.Start();
+        await worker.DoMyworkAsync();
+```
+
+## Console apps with ConsoleAggregateReporter
+
+```csharp
+    var worker = new InstallerWorker();
+
+    using var reporter = new ConsoleAggregateReporterBuilder()
+        .DisplayingStartingTime()
+        .DisplayingElapsedTime()
+        .DisplayingTimeOfArrival()
+        .DisplayingRemainingTime()
+        .DisplayingItemsSummary()
+        .DisplayingItemsOverview()
+        .NotifyingProgress(OnProgress)
+        .NotifyingCompletion(OnCompletion)
+        .ExportingTo("output.json", FileType.Json)
+        .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
+        .UsingWorkload(worker.CalcRequirements, BarDescriptor.Default)
+        .UsingWorkload(worker.DownloadArtifacts, BarDescriptor.Default)
+        .UsingWorkload(worker.InstallArtifacts, BarDescriptor.Default)
+        .Build();
+
+    worker.OnSuccess = reporter.ReportSuccess;
+    worker.OnFailure = reporter.ReportFailure;
+
+    reporter.Start();
+    await worker.CalcRequirements.CalcAsync();
+    Task[] restTasks = [worker.DownloadArtifacts.DownloadAsync(), worker.InstallArtifacts.InstallAsync()];
+    await Task.WhenAll(restTasks);
+```
+
+
+## Background services
+
+```csharp
+internal class HostedService : IHostedService
 {
-    OnSuccess = () => reporter.ReportSuccess(),
-    OnFailure = () => reporter.ReportFailure(),
-};
+    private readonly SimpleWorker _worker = new();
+    private readonly BackgroundReporter _reporter;
 
-reporter.Start();
-await worker.DoMywork();
-```
-
-### Define the component to show progress
-Components are subjected to the ConsoleReporter.
-
-```csharp
-var descriptor = new BarDescriptor()
-    .UsingProgressSymbol('#')
-    .UsingWidth(50)
-    .DisplayingPercent();
-```
-
-or use the default one
-```csharp
-var descriptor = BarDescriptor.Default;
-```
-
-### Define the reporter to use the component
-```csharp
-var reporter = new ConsoleReporterBuilder()
-    .DisplayingStartingTime()
-    .DisplayingElapsedTime()
-    .DisplayingTimeOfArrival()
-    .DisplayingRemainingTime()
-    .DisplayingItemsSummary()
-    .DisplayingItemsOverview()
-    .NotifyingProgress(onProgress)
-    .NotifyingCompletion(onCompletion)
-    .ExportingTo("output.json", FileType.Json)
-    .UsingReportingFrequency(TimeSpan.FromMilliseconds(50))
-    .UsingComponentDescriptor(BarDescriptor.Default)
-    .Build(Worker.AllItems);
-```
-
-## Report progress for background jobs
-In case your workload happens in the background and you only pretend to collect progression status during certain moments of the execution, or export the results at the end, the BackgroundReporter may help you to remove all the boilerplate.
-
-```csharp
-_reporter = new BackgroundReporterBuilder()
-    .NotifyingProgress((stats) =>
+    public HostedService(ILogger<HostedService> logger)
     {
-        logger.LogDebug("Getting stats on progress {percent}", stats.CurrentPercent);
-    })
-    .NotifyingCompletion((stats) =>
+        _reporter = new BackgroundReporterBuilder()
+            .NotifyingProgress((stats) =>
+            {
+                logger.LogDebug("Getting stats on progress {percent}", stats.CurrentPercent);
+            })
+            .NotifyingCompletion((stats) =>
+            {
+                logger.LogDebug("Getting stats on completion");
+            })
+            .Build(SimpleWorker.ExpectedItems);
+
+        _worker.OnSuccess = () => _reporter.ReportSuccess();
+        _worker.OnFailure = () => _reporter.ReportFailure();
+    }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {        
+        _reporter.Start();
+        await _worker.DoMyworkAsync();
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
     {
-        logger.LogDebug("Getting stats on completion");
-    })
-    .Build(Worker.AllItems);
-
-_worker.OnSuccess = () => _reporter.ReportSuccess();
-_worker.OnFailure = () => _reporter.ReportFailure();
-```
-
-### Start the reporter
-```csharp
-reporter.Start();
-```
-
-### Stop the reporter
-```csharp
-reporter.Stop();
-```
-
-### Resume the reporter
-```csharp
-reporter.Resume();
-```
-
-### Report progress
-```csharp
-reporter.ReportSuccess()
-reporter.ReportFailure()
-```
-
-### Collect stats while running
-```csharp
-var onProgress = (Stats stats) =>
-{
-    // TODO: Do something useful
-};
-
-var onCompletion = (Stats stats) =>
-{
-    // TODO: Do something useful
-};
-
-var reporter = new ConsoleReporterBuilder()
-    .NotifyingProgress(onProgress)
-    .NotifyingCompletion(onCompletion)
-    .Build(Worker.AllItems);
-```
-
-
-### Exports final stats (json, csv, xml, txt)
-```csharp
-var reporter = new ConsoleReporterBuilder()
-    .ExportingTo("output.json", FileType.Json)
-    .Build(Worker.AllItems);
+        _reporter.Stop();
+        return Task.CompletedTask;
+    }
+}
 ```

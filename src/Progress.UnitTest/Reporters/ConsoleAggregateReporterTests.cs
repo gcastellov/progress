@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Progress.UnitTest.Reporters;
 
-public class ConsoleReporterTests
+public class ConsoleAggregateReporterTests
 {
-    public ConsoleReporterTests()
+    public ConsoleAggregateReporterTests()
     {
         StringBuilder builder = new();
         TextWriter writer = new StringWriter(builder);
@@ -19,7 +19,7 @@ public class ConsoleReporterTests
         // Arrange
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload);
+        var reporter = new ConsoleAggregateReporter([workload]);
 
         // Assert
         reporter.Configuration.Options.DisplayStartingTime.Should().BeTrue();
@@ -45,22 +45,30 @@ public class ConsoleReporterTests
         // Act
         var workload = Workload.Default(0);
         workload.Component = BarDescriptor.Default.Build();
-        var action = () => new ConsoleReporter(workload);
+        var action = () => new ConsoleAggregateReporter([workload]);
 
         // Assert
         action.Should().Throw<ArgumentException>();
     }
 
     [Fact]
-    public void GivenNoComponent_WhenInitializing_ThenThrowsException()
+    public void GivenNoCollectionOfWorkflows_WhenInitializing_ThenThrowsException()
     {
         // Act
-        var workload = Workload.Default(100);
-        workload.Component = null!;
-        var action = () => new ConsoleReporter(workload);
+        var action = () => new ConsoleAggregateReporter(null!);
 
         // Assert
         action.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void GivenNoWorkflows_WhenInitializing_ThenThrowsException()
+    {
+        // Act
+        var action = () => new ConsoleAggregateReporter([]);
+
+        // Assert
+        action.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -69,7 +77,7 @@ public class ConsoleReporterTests
         // Arrange
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload);
+        var reporter = new ConsoleAggregateReporter([workload]);
 
         // Act
         var action = () => reporter.Stop();
@@ -84,7 +92,7 @@ public class ConsoleReporterTests
         // Arrange
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload);
+        var reporter = new ConsoleAggregateReporter([workload]);
 
         // Act
         var action = () => reporter.Resume();
@@ -99,7 +107,7 @@ public class ConsoleReporterTests
         // Arrange
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        using var reporter = new ConsoleReporter(workload);
+        using var reporter = new ConsoleAggregateReporter([workload]);
         reporter.Start();
 
         // Act
@@ -115,7 +123,7 @@ public class ConsoleReporterTests
         // Arrange
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload);
+        var reporter = new ConsoleAggregateReporter([workload]);
         reporter.Start();
 
         // Act
@@ -128,7 +136,7 @@ public class ConsoleReporterTests
         // Arrange
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload);
+        var reporter = new ConsoleAggregateReporter([workload]);
         reporter.Start();
         reporter.Stop();
 
@@ -143,7 +151,7 @@ public class ConsoleReporterTests
         bool isCalled = false;
         var workload = Workload.Default(100);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload)
+        var reporter = new ConsoleAggregateReporter([workload])
         {
             OnProgress = (stats) => isCalled = true
         };
@@ -165,9 +173,9 @@ public class ConsoleReporterTests
     {
         // Arrange
         bool isCalled = false;
-        var workload = Workload.Default(1);
+        var workload = new Workload("Install", "Install stuff", 1);
         workload.Component = BarDescriptor.Default.Build();
-        var reporter = new ConsoleReporter(workload)
+        var reporter = new ConsoleAggregateReporter([workload])
         {
             OnCompletion = (stats) => isCalled = true
         };
@@ -178,7 +186,7 @@ public class ConsoleReporterTests
         reporter.Start();
 
         // Act
-        reporter.ReportSuccess();
+        reporter.ReportSuccess(workload.Id);
         await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
         // Assert

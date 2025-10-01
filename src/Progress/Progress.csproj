@@ -36,6 +36,10 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\Content</PackagePath>
 	  </None>
+	  <None Include="Content/logo512x512.png">
+		<Pack>True</Pack>
+		<PackagePath>\Content</PackagePath>
+	  </None>	
 	  <None Include="Content/README.md">
 	    <Pack>True</Pack>
 	    <PackagePath>\Content</PackagePath>
