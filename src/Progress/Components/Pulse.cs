@@ -55,7 +55,7 @@ internal class Pulse : Component
     {
         Array.Fill(_bar, ' ');
 
-        if (CurrentPercent.Value < 100)
+        if (CurrentPercent.IsInRange)
             _bar[_index] = _progressSymbol;
     }
 }

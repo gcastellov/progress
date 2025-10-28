@@ -25,6 +25,7 @@ internal abstract class Component
         }
 
         public double Value => _percent * 100;
+        public bool IsInRange => Value > 0 && Value < 100;
 
         public override string ToString() => _percent.ToString("P02", Culture);
     }

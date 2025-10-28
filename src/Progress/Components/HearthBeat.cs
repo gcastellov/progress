@@ -73,7 +73,7 @@ internal class HearthBeat : Component
     {
         Array.Fill(_bar, ' ');
 
-        if (CurrentPercent.Value < 100)
+        if (CurrentPercent.IsInRange)
         {
             _bar[_leftIndex] = _progressSymbol;
             _bar[_rightIndex] = _progressSymbol;
