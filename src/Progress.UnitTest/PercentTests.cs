@@ -23,4 +23,24 @@ public class PercentTests
         // Assert
         actual.Should().Be(expectedOutput);
     }
+
+    [Theory]
+    [InlineData(0, false)]
+    [InlineData(1, true)]
+    [InlineData(3, true)]
+    [InlineData(50, true)]
+    [InlineData(75, true)]
+    [InlineData(100, false)]
+    [InlineData(120, false)]
+    public void GivenPercent_WhenCheckingIfInRange_ReturnsExpected(ulong count, bool expected)
+    {
+        // Arrange
+        var percent = new Component.Percent(100, count);
+
+        // Act
+        bool actual = percent.IsInRange;
+
+        // Assert
+        actual.Should().Be(expected);
+    }
 }

@@ -33,20 +33,27 @@ internal class Spinner : Component
 
     private void Fill()
     {
-        _current = _counter switch
+        if (CurrentPercent.IsInRange)
         {
-            1 => '/',
-            2 => '-',
-            3 => '\\',
-            5 => '/',
-            6 => '-',
-            7 => '\\',
-            _ => '|'
-        };
+            _current = _counter switch
+            {
+                1 => '/',
+                2 => '-',
+                3 => '\\',
+                5 => '/',
+                6 => '-',
+                7 => '\\',
+                _ => '|'
+            };
 
-        if (_counter == 7)
-            _counter = 0;
+            if (_counter == 7)
+                _counter = 0;
+            else
+                _counter++;
+        }
         else
-            _counter++;
+        {
+            _current = ' ';
+        }
     }
 }
