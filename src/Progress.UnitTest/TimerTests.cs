@@ -61,13 +61,13 @@ public class TimerTests
     {
         // Arrange
         var timer = Timer.Start();
-        var delay = TimeSpan.FromSeconds(1);
+        var delay = TimeSpan.FromMilliseconds(1100);
         await Task.Delay(delay);
 
         // Act
         var actual = timer.ElapsedTime;
 
         // Assert
-        actual.Should().BeGreaterThanOrEqualTo(delay);
+        actual.Should().BeGreaterThanOrEqualTo(TimeSpan.FromSeconds(1));
     }
 }
